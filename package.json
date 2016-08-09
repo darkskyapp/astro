@@ -1,0 +1,54 @@
+{
+  "name": "astro",
+  "version": "1.0.0",
+  "description": "Solar and lunar position calculations",
+  "main": "index.js",
+  "dependencies": {
+    "chai": "^3.5.0",
+    "jshint": "^2.9.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "cloc": "^2.1.0",
+    "istanbul": "^0.4.4",
+    "jshint": "^2.9.2",
+    "mocha": "^3.0.2"
+  },
+  "scripts": {
+    "stats": "cloc --exclude-dir=build,coverage,node_modules --exclude-lang=HTML,JSON,Markdown,XML,YAML --quiet .",
+    "lint": "jshint . --exclude build,coverage,node_modules,var",
+    "cover": "NODE_ENV=test istanbul cover _mocha -- --check-leaks --recursive",
+    "test": "npm run lint && npm run cover"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darkskyapp/astro.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/darkskyapp/astro/issues"
+  },
+  "homepage": "https://github.com/darkskyapp/astro#readme",
+  "jshintConfig": {
+    "curly": true,
+    "esnext": true,
+    "eqeqeq": true,
+    "forin": true,
+    "freeze": true,
+    "futurehostile": true,
+    "latedef": true,
+    "maxlen": 80,
+    "mocha": true,
+    "noarg": true,
+    "nocomma": true,
+    "node": true,
+    "nonbsp": true,
+    "nonew": true,
+    "sub": true,
+    "strict": true,
+    "undef": true,
+    "unused": "vars",
+    "varstmt": true
+  }
+}
