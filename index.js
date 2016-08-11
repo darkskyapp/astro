@@ -26,12 +26,18 @@ function julian_to_date(t) {
 const GMST0 = 18.697374558      * Math.PI / 12,
       GMST1 = 24.06570982441908 * Math.PI / 12;
 
-function greenwich_mean_sidereal_time(t) {
-  return GMST0 + GMST1 * t;
+function greenwich_mean_sidereal_time(jt) {
+  return GMST0 + GMST1 * jt;
 }
 
-function local_sidereal_time(t, lon) {
-  return greenwich_mean_sidereal_time(t) + lon;
+function local_sidereal_time(jt, lon_r) {
+  return greenwich_mean_sidereal_time(jt) + lon_r;
+}
+
+function hour_angle(jt, lon_r) {
+  const angle =
+    (local_sidereal_time(jt, lon_r) - solar.right_ascension(jt)) % (2*Math.PI);
+  return (angle > Math.PI) ? angle - 2*Math.PI : angle;
 }
 
 exports.unix_to_julian      = unix_to_julian;
@@ -39,5 +45,6 @@ exports.date_to_julian      = date_to_julian;
 exports.julian_to_unix      = julian_to_unix;
 exports.julian_to_date      = julian_to_date;
 exports.local_sidereal_time = local_sidereal_time;
+exports.hour_angle          = hour_angle;
 exports.solar               = solar;
 exports.lunar               = lunar;
