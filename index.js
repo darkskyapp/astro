@@ -35,9 +35,12 @@ function local_sidereal_time(jt, lon_r) {
 }
 
 function hour_angle(jt, lon_r) {
-  const angle =
-    (local_sidereal_time(jt, lon_r) - solar.right_ascension(jt)) % (2*Math.PI);
-  return (angle > Math.PI) ? angle - 2*Math.PI : angle;
+  let angle = local_sidereal_time(jt, lon_r) - solar.right_ascension(jt);
+  angle -= Math.floor(angle / (2 * Math.PI)) * (2 * Math.PI);
+  if(angle > Math.PI) {
+    angle -= 2 * Math.PI;
+  }
+  return angle;
 }
 
 exports.unix_to_julian      = unix_to_julian;
