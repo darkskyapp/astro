@@ -1,16 +1,24 @@
 "use strict";
-const lunar = require("./lib/lunar"),
-      solar = require("./lib/solar");
+const lunar = require("./lib/lunar");
+const solar = require("./lib/solar");
 
-/* Convert to/from J2000 dates. */
+// Convert to/from J2000 dates.
 const J1970 = -10957.5;
+
+function ms_to_julian(ms) {
+  return J1970 + ms / 86400000;
+}
 
 function unix_to_julian(unix) {
   return J1970 + unix / 86400;
 }
 
 function date_to_julian(date) {
-  return J1970 + date.getTime() / 86400000;
+  return ms_to_julian(date.getTime());
+}
+
+function julian_to_ms(t) {
+  return (t - J1970) * 86400000;
 }
 
 function julian_to_unix(t) {
@@ -18,11 +26,11 @@ function julian_to_unix(t) {
 }
 
 function julian_to_date(t) {
-  return new Date((t - J1970) * 86400000);
+  return new Date(julian_to_ms(t));
 }
 
-/* Greenwich mean sidereal time, accurate to ~1 second.
- * http://aa.usno.navy.mil/faq/docs/GAST.php */
+// Greenwich mean sidereal time, accurate to ~1 second.
+// http://aa.usno.navy.mil/faq/docs/GAST.php
 const GMST0 = 18.697374558      * Math.PI / 12,
       GMST1 = 24.06570982441908 * Math.PI / 12;
 
@@ -43,11 +51,13 @@ function hour_angle(jt, lon_r) {
   return angle;
 }
 
-exports.unix_to_julian      = unix_to_julian;
-exports.date_to_julian      = date_to_julian;
-exports.julian_to_unix      = julian_to_unix;
-exports.julian_to_date      = julian_to_date;
+exports.ms_to_julian = ms_to_julian;
+exports.unix_to_julian = unix_to_julian;
+exports.date_to_julian = date_to_julian;
+exports.julian_to_ms = julian_to_ms;
+exports.julian_to_unix = julian_to_unix;
+exports.julian_to_date = julian_to_date;
 exports.local_sidereal_time = local_sidereal_time;
-exports.hour_angle          = hour_angle;
-exports.solar               = solar;
-exports.lunar               = lunar;
+exports.hour_angle = hour_angle;
+exports.solar = solar;
+exports.lunar = lunar;
