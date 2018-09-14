@@ -49,11 +49,11 @@ describe("lunar", () => {
   ];
 
   const transits = [
-    Date.parse("2006-03-20T04:08-0700"),
-    Date.parse("2016-03-12T15:28-0500"),
-    Date.parse("2016-03-12T15:28-0500"),
-    Date.parse("2017-11-30T21:27-0500"),
+    Date.parse("2006-03-21T05:02-0700"),
+    Date.parse("2016-03-13T17:24-0400"),
+    Date.parse("2016-03-13T17:24-0400"),
     Date.parse("2017-12-01T22:22-0500"),
+    Date.parse("2017-12-02T23:20-0500"),
   ];
 
   const sets = [
