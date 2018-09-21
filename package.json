@@ -1,23 +1,21 @@
 {
   "name": "astro",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Solar and lunar position calculations",
   "main": "index.js",
-  "dependencies": {
-    "chai": "^3.5.0",
-    "jshint": "^2.9.2"
-  },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "cloc": "^2.1.0",
-    "istanbul": "^0.4.4",
-    "jshint": "^2.9.2",
-    "mocha": "^3.0.2"
+    "@darkskyapp/eslint-config": "^1.1.1",
+    "chai": "^4.1.2",
+    "eslint": "^4.19.1",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.7.0",
+    "nyc": "^11.6.0",
+    "mocha": "^5.0.5"
   },
   "scripts": {
-    "stats": "cloc --exclude-dir=build,coverage,node_modules --exclude-lang=HTML,JSON,Markdown,XML,YAML --quiet .",
-    "lint": "jshint . --exclude build,coverage,node_modules,var",
-    "cover": "NODE_ENV=test istanbul cover _mocha -- --check-leaks --recursive",
+    "lint": "eslint .",
+    "lintfix": "eslint --fix .",
+    "cover": "NODE_ENV=test nyc -c false -r html mocha",
     "test": "npm run lint && npm run cover"
   },
   "repository": {

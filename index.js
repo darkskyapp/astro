@@ -31,8 +31,8 @@ function julian_to_date(t) {
 
 // Greenwich mean sidereal time, accurate to ~1 second.
 // http://aa.usno.navy.mil/faq/docs/GAST.php
-const GMST0 = 18.697374558      * Math.PI / 12,
-      GMST1 = 24.06570982441908 * Math.PI / 12;
+const GMST0 = 18.697374558 * Math.PI / 12;
+const GMST1 = 24.06570982441908 * Math.PI / 12;
 
 function greenwich_mean_sidereal_time(jt) {
   return GMST0 + GMST1 * jt;
