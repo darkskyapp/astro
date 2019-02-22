@@ -89,7 +89,7 @@ describe("lunar", () => {
       input.lat * (Math.PI / 180),
       input.lon * (Math.PI / 180)
     );
-    const calculated_value = astro.julian_to_date(calculation).getTime();
+    const calculated_value = astro.julian.from(calculation);
     if(isNaN(result)) {
       expect(calculated_value).to.be.NaN; // jshint ignore:line
     }
