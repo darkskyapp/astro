@@ -10,44 +10,44 @@ describe("lunar", () => {
   const inputs = [
     {
       // Albuquerque
-      t: astro.date_to_julian(new Date("2006-03-20T19:06:28.800Z")),
+      t: astro.julian.to(Date.parse("2006-03-20T19:06:28.800Z")),
       lat: 35.05,
       lon: -106.62,
     },
     {
       // NYC starting at midnight for some day...
-      t: astro.date_to_julian(new Date("2016-03-13T00:00:00-0500")),
+      t: astro.julian.to(Date.parse("2016-03-13T00:00:00-0500")),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // NYC ... later that day so we can get a diff moonrise time!
-      t: astro.date_to_julian(new Date("2016-03-13T12:00:00-0500")),
+      t: astro.julian.to(Date.parse("2016-03-13T12:00:00-0500")),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // NYC ... a different period entirely...
-      t: astro.date_to_julian(new Date("2017-12-01T00:00:00-0500")),
+      t: astro.julian.to(Date.parse("2017-12-01T00:00:00-0500")),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // NYC ... and forward in that period so we get no transit ...
-      t: astro.date_to_julian(new Date("2017-12-01T22:30:00-0500")),
+      t: astro.julian.to(Date.parse("2017-12-01T22:30:00-0500")),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // NYC ... and forward in that period so we get next transit ...
-      t: astro.date_to_julian(new Date("2017-12-01T23:30:00-0500")),
+      t: astro.julian.to(Date.parse("2017-12-01T23:30:00-0500")),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // Troy, NY .. but what's more important, right around the moon
       // transit time!!
-      t: astro.date_to_julian(new Date("2016-01-01T05:00:00-0500")),
+      t: astro.julian.to(Date.parse("2016-01-01T05:00:00-0500")),
       lat: 42.73,
       lon: -73.68,
     },

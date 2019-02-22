@@ -1,5 +1,4 @@
 "use strict";
-const astro = require("../index");
 const solar = require("../lib/solar");
 const expect = require("chai").expect;
 
@@ -8,35 +7,32 @@ describe("solar", () => {
 
   /* http://aa.usno.navy.mil/rstt/onedaytable
    *  ?ID=AA&year=2006&month=3&day=20&state=NM&place=Albuquerque */
-  const date = new Date("2006-03-20T19:06:28.800Z");
-  const t = astro.date_to_julian(date);
-  const lat = 35.05 * (Math.PI / 180);
-  const lon = -106.62 * (Math.PI / 180);
+  const ms = Date.parse("2006-03-20T19:06:28.800Z");
+  const lat = 35.05;
+  const lon = -106.62;
 
   it("should return the nearest civil dawn to a given time", () => {
-    expect(astro.julian_to_date(solar.dawn(t, lat, lon)).getTime()).
+    expect(solar.ms_for_dawn(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T05:45-0700"), 120000);
   });
 
   it("should return the nearest sunrise to a given time", () => {
-    expect(astro.julian_to_date(solar.rise(t, lat, lon)).getTime()).
+    expect(solar.ms_for_rise(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T06:10-0700"), 120000);
   });
 
   it("should return the nearest solar transit to a given time", () => {
-    expect(
-      astro.julian_to_date(solar.transit(t, lat, lon)).getTime()
-    ).
+    expect(solar.ms_for_transit(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T12:14-0700"), 120000);
   });
 
   it("should return the nearest sunset to a given time", () => {
-    expect(astro.julian_to_date(solar.set(t, lat, lon)).getTime()).
+    expect(solar.ms_for_set(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T18:18-0700"), 120000);
   });
 
   it("should return the nearest civil dusk to a given time", () => {
-    expect(astro.julian_to_date(solar.dusk(t, lat, lon)).getTime()).
+    expect(solar.ms_for_dusk(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T18:43-0700"), 120000);
   });
 });
