@@ -12,27 +12,27 @@ describe("solar", () => {
   const lon = -106.62;
 
   it("should return the nearest civil dawn to a given time", () => {
-    expect(solar.ms_for_dawn(ms, lat, lon)).
+    expect(solar.dawn(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T05:45-0700"), 120000);
   });
 
   it("should return the nearest sunrise to a given time", () => {
-    expect(solar.ms_for_rise(ms, lat, lon)).
+    expect(solar.rise(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T06:10-0700"), 120000);
   });
 
-  it("should return the nearest solar transit to a given time", () => {
-    expect(solar.ms_for_transit(ms, lat, lon)).
+  it("should return the nearest solar noon to a given time", () => {
+    expect(solar.noon(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T12:14-0700"), 120000);
   });
 
   it("should return the nearest sunset to a given time", () => {
-    expect(solar.ms_for_set(ms, lat, lon)).
+    expect(solar.set(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T18:18-0700"), 120000);
   });
 
   it("should return the nearest civil dusk to a given time", () => {
-    expect(solar.ms_for_dusk(ms, lat, lon)).
+    expect(solar.dusk(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T18:43-0700"), 120000);
   });
 });
