@@ -1,6 +1,6 @@
 {
   "name": "astro",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "Solar and lunar position calculations",
   "main": "index.js",
   "devDependencies": {
@@ -27,26 +27,5 @@
   "bugs": {
     "url": "https://github.com/darkskyapp/astro/issues"
   },
-  "homepage": "https://github.com/darkskyapp/astro#readme",
-  "jshintConfig": {
-    "curly": true,
-    "esnext": true,
-    "eqeqeq": true,
-    "forin": true,
-    "freeze": true,
-    "futurehostile": true,
-    "latedef": true,
-    "maxlen": 80,
-    "mocha": true,
-    "noarg": true,
-    "nocomma": true,
-    "node": true,
-    "nonbsp": true,
-    "nonew": true,
-    "sub": true,
-    "strict": true,
-    "undef": true,
-    "unused": "vars",
-    "varstmt": true
-  }
+  "homepage": "https://github.com/darkskyapp/astro#readme"
 }

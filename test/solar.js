@@ -21,8 +21,8 @@ describe("solar", () => {
       to.be.closeTo(Date.parse("2006-03-20T06:10-0700"), 120000);
   });
 
-  it("should return the nearest solar noon to a given time", () => {
-    expect(solar.noon(ms, lat, lon)).
+  it("should return the nearest solar transit to a given time", () => {
+    expect(solar.transit(ms, lat, lon)).
       to.be.closeTo(Date.parse("2006-03-20T12:14-0700"), 120000);
   });
 
