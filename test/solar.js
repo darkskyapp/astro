@@ -51,15 +51,15 @@ describe("solar", () => {
     expect(90 - syene.elevation * 180 / Math.PI).to.be.closeTo(0, 0.01);
 
     // Now, I'm in Alexandria and I measure the sun's angle at solar noon using
-    // ~a gnomon~ Javascript and some math.
+    // a meter-long gnomon. The length of its shadow is about 1/7 m.
     const alexandria = pos.observer(31.200000, 29.916667);
-    expect(90 - alexandria.elevation * 180 / Math.PI).to.be.closeTo(8, 1);
+    expect(1 / Math.tan(alexandria.elevation)).to.be.closeTo(0.14, 0.01);
 
     // I know from merchant traders that the distance between Alexandria and
     // Syene is about ~5000 stadia~ 912km. So how big is the earth?
     const earth = 912.017 * 2 * Math.PI / (syene.elevation - alexandria.elevation);
-    expect(earth).to.be.closeTo(40075.017, 200);
+    expect(earth).to.be.closeTo(40075.017, 100);
 
-    // Hey! Accurate to within half a percent! That's pretty good.
+    // Hey! Accurate to within a quarter of a percent! That's pretty good.
   });
 });
