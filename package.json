@@ -1,21 +1,21 @@
 {
   "name": "astro",
-  "version": "1.4.1",
+  "version": "2.0.0",
   "description": "Solar and lunar position calculations",
   "main": "index.js",
   "devDependencies": {
     "@darkskyapp/eslint-config": "^1.1.1",
-    "chai": "^4.1.2",
-    "eslint": "^4.19.1",
-    "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-promise": "^3.7.0",
-    "nyc": "^11.6.0",
-    "mocha": "^5.0.5"
+    "chai": "^4.2.0",
+    "eslint": "^5.14.0",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0"
   },
   "scripts": {
     "lint": "eslint .",
     "lintfix": "eslint --fix .",
-    "cover": "NODE_ENV=test nyc -c false -r html mocha",
+    "cover": "NODE_ENV=test nyc --reporter=html --reporter=text-summary mocha",
     "test": "npm run lint && npm run cover"
   },
   "repository": {
@@ -27,26 +27,5 @@
   "bugs": {
     "url": "https://github.com/darkskyapp/astro/issues"
   },
-  "homepage": "https://github.com/darkskyapp/astro#readme",
-  "jshintConfig": {
-    "curly": true,
-    "esnext": true,
-    "eqeqeq": true,
-    "forin": true,
-    "freeze": true,
-    "futurehostile": true,
-    "latedef": true,
-    "maxlen": 80,
-    "mocha": true,
-    "noarg": true,
-    "nocomma": true,
-    "node": true,
-    "nonbsp": true,
-    "nonew": true,
-    "sub": true,
-    "strict": true,
-    "undef": true,
-    "unused": "vars",
-    "varstmt": true
-  }
+  "homepage": "https://github.com/darkskyapp/astro#readme"
 }

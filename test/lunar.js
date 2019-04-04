@@ -1,5 +1,4 @@
 "use strict";
-const astro = require("../index");
 const lunar = require("../lib/lunar");
 const expect = require("chai").expect;
 
@@ -10,44 +9,44 @@ describe("lunar", () => {
   const inputs = [
     {
       // Albuquerque
-      t: astro.date_to_julian(new Date("2006-03-20T19:06:28.800Z")),
+      t: Date.parse("2006-03-20T19:06:28.800Z"),
       lat: 35.05,
       lon: -106.62,
     },
     {
       // NYC starting at midnight for some day...
-      t: astro.date_to_julian(new Date("2016-03-13T00:00:00-0500")),
+      t: Date.parse("2016-03-13T00:00:00-0500"),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // NYC ... later that day so we can get a diff moonrise time!
-      t: astro.date_to_julian(new Date("2016-03-13T12:00:00-0500")),
+      t: Date.parse("2016-03-13T12:00:00-0500"),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // NYC ... a different period entirely...
-      t: astro.date_to_julian(new Date("2017-12-01T00:00:00-0500")),
+      t: Date.parse("2017-12-01T00:00:00-0500"),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // NYC ... and forward in that period so we get no transit ...
-      t: astro.date_to_julian(new Date("2017-12-01T22:30:00-0500")),
+      t: Date.parse("2017-12-01T22:30:00-0500"),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // NYC ... and forward in that period so we get next transit ...
-      t: astro.date_to_julian(new Date("2017-12-01T23:30:00-0500")),
+      t: Date.parse("2017-12-01T23:30:00-0500"),
       lat: 40.71,
       lon: -74.01,
     },
     {
       // Troy, NY .. but what's more important, right around the moon
       // transit time!!
-      t: astro.date_to_julian(new Date("2016-01-01T05:00:00-0500")),
+      t: Date.parse("2016-01-01T05:00:00-0500"),
       lat: 42.73,
       lon: -73.68,
     },
@@ -84,14 +83,9 @@ describe("lunar", () => {
   ];
 
   function _check_calculation(input, result, lookup_function) {
-    const calculation = lookup_function(
-      input.t,
-      input.lat * (Math.PI / 180),
-      input.lon * (Math.PI / 180)
-    );
-    const calculated_value = astro.julian_to_date(calculation).getTime();
+    const calculated_value = lookup_function(input.t, input.lat, input.lon);
     if(isNaN(result)) {
-      expect(calculated_value).to.be.NaN; // jshint ignore:line
+      expect(calculated_value).to.be.NaN;
     }
     else {
       expect(
@@ -117,6 +111,4 @@ describe("lunar", () => {
       _check_calculation(inputs[i], sets[i], lunar.set);
     }
   });
-
-
 });
