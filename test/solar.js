@@ -62,4 +62,26 @@ describe("solar", () => {
 
     // Hey! Accurate to within a quarter of a percent! That's pretty good.
   });
+
+  const spring = Date.parse("1999-03-21T01:46Z");
+  const summer = Date.parse("1999-06-21T19:49Z");
+  const autumn = Date.parse("1999-09-23T11:32Z");
+  const winter = Date.parse("1999-12-22T07:44Z");
+
+  it("should calculate the time of a given solar longitude", () => {
+    const eps = 600000; // try to be accurate to 10 minutes
+
+    // Note these dates are the times of the equinoxes and solstices in 1999.
+    expect(solar.inverse_longitude(Math.PI * 0.0)).to.be.closeTo(spring, eps);
+    expect(solar.inverse_longitude(Math.PI * 0.5)).to.be.closeTo(summer, eps);
+    expect(solar.inverse_longitude(Math.PI * 1.0)).to.be.closeTo(autumn, eps);
+    expect(solar.inverse_longitude(Math.PI * 1.5)).to.be.closeTo(winter, eps);
+  });
+
+  it("should calculate the distance of the sun", () => {
+    expect(solar.distance(spring)).to.be.closeTo(1.00, 0.01);
+    expect(solar.distance(summer)).to.be.closeTo(1.02, 0.01);
+    expect(solar.distance(autumn)).to.be.closeTo(1.00, 0.01);
+    expect(solar.distance(winter)).to.be.closeTo(0.98, 0.01);
+  });
 });
