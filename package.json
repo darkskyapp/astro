@@ -1,6 +1,6 @@
 {
   "name": "astro",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Solar and lunar position calculations",
   "main": "index.js",
   "devDependencies": {
