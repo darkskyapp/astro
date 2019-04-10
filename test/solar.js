@@ -59,12 +59,14 @@ describe("solar", () => {
 
     const syene = pos.observer(23.43679, 32.899722);
     expect(90 - syene.elevation * 180 / Math.PI).to.be.closeTo(0, 0.01);
-    expect(syene.azimuth * 180 / Math.PI).to.be.closeTo(88.8, 1);
+    // NOTE: Don't test azimuth here. It's a non-sense number when the sun is
+    // directly overhead.
 
     // Now, I'm in Alexandria and I measure the sun's angle at solar noon using
     // a meter-long gnomon. The length of its shadow is about 1/7 m.
     const alexandria = pos.observer(31.200000, 29.916667);
     expect(1 / Math.tan(alexandria.elevation)).to.be.closeTo(0.14, 0.01);
+    // Check the azimuth, just to make sure it's there and correct.
     expect(alexandria.azimuth * 180 / Math.PI).to.be.closeTo(161.2, 1);
 
     // I know from merchant traders that the distance between Alexandria and
