@@ -2,6 +2,16 @@
 const solar = require("../lib/solar");
 const expect = require("chai").expect;
 
+
+function limit_degrees(rad) {
+  const degrees = rad * 180/ Math.PI /360.0;
+  let limited = 360.0 * (degrees-Math.floor(degrees));
+  if(limited < 0) {
+    limited += 360.0;
+  }
+  return limited;
+}
+
 describe("solar", () => {
   /* FIXME: lots of methods to test */
 
@@ -84,15 +94,6 @@ describe("solar", () => {
     expect(solar.distance(autumn)).to.be.closeTo(1.00, 0.01);
     expect(solar.distance(winter)).to.be.closeTo(0.98, 0.01);
   });
-
-  function limit_degrees(rad) {
-    const degrees = rad * 180/ Math.PI /360.0;
-    let limited = 360.0 * (degrees-Math.floor(degrees));
-    if(limited < 0) {
-      limited += 360.0;
-    }
-    return limited;
-  }
 
   it("should calculate azimuth of the sun", () => {
     // https://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?form=2&body=10&year=2019&month=4&day=10&intv_mag=10&place=Salvador%2C+Brazil&lon_sign=-1&lon_deg=38&lon_min=28&lat_sign=-1&lat_deg=12&lat_min=58&tz=3&tz_sign=-1
