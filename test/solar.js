@@ -59,11 +59,13 @@ describe("solar", () => {
 
     const syene = pos.observer(23.43679, 32.899722);
     expect(90 - syene.elevation * 180 / Math.PI).to.be.closeTo(0, 0.01);
+    expect(syene.azimuth * 180 / Math.PI).to.be.closeTo(88.8, 1);
 
     // Now, I'm in Alexandria and I measure the sun's angle at solar noon using
     // a meter-long gnomon. The length of its shadow is about 1/7 m.
     const alexandria = pos.observer(31.200000, 29.916667);
     expect(1 / Math.tan(alexandria.elevation)).to.be.closeTo(0.14, 0.01);
+    expect(alexandria.azimuth * 180 / Math.PI).to.be.closeTo(161.2, 1);
 
     // I know from merchant traders that the distance between Alexandria and
     // Syene is about ~5000 stadia~ 912km. So how big is the earth?
@@ -109,7 +111,7 @@ describe("solar", () => {
       283.3, 282.5, 281.8, 281.2, 280.5, 279.9, 279.3, 278.7, 278.2, 277.6,
       277.1, 276.5, 276.0,
     ];
-    const salvador_ms = new Date("2019-04-10T05:00:00-0300").valueOf();
+    const salvador_ms = Date.parse("2019-04-10T05:00:00-0300");
     for(let i = 0; i < salvador_positions.length; i++) {
       const azimuth = salvador_positions[i];
       const actual = solar.azimuth(salvador_ms + 600000 * i, -12.96667, -38.46667);
@@ -132,7 +134,7 @@ describe("solar", () => {
       287.2, 289.3, 291.5, 293.7, 295.9, 298.1, 300.3, 302.6, 304.8, 307.1,
       309.4,
     ];
-    const stockholm_ms = new Date("2019-04-10T04:10:00+0200").valueOf();
+    const stockholm_ms = Date.parse("2019-04-10T04:10:00+0200");
     for(let i = 0; i < stockholm_positions.length; i++) {
       const azimuth = stockholm_positions[i];
       const actual = solar.azimuth(stockholm_ms + 600000 * i, 59.31667, 18.06667);
@@ -152,7 +154,7 @@ describe("solar", () => {
       289.2, 287.6, 286.1, 284.7, 283.2, 281.8, 280.4, 279.0, 277.6, 276.3,
       274.9, 273.5, 272.2,
     ];
-    const sydney_ms = new Date("2019-04-10T05:20:00+1000").valueOf();
+    const sydney_ms = Date.parse("2019-04-10T05:20:00+1000");
     for(let i = 0; i < sydney_positions.length; i++) {
       const azimuth = sydney_positions[i];
       const actual = solar.azimuth(sydney_ms + 600000 * i, -33.85, 151.2);
