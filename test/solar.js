@@ -82,6 +82,15 @@ describe("solar", () => {
   const autumn = Date.parse("1999-09-23T11:32Z");
   const winter = Date.parse("1999-12-22T07:44Z");
 
+  it("should calculate the solar longitude of a given time", () => {
+    const eps = 0.5/3600; // try to be accurate to half an arcsecond
+
+    expect(solar.longitude(spring)).to.be.closeTo(Math.PI * 0.0, eps);
+    expect(solar.longitude(summer)).to.be.closeTo(Math.PI * 0.5, eps);
+    expect(solar.longitude(autumn)).to.be.closeTo(Math.PI * 1.0, eps);
+    expect(solar.longitude(winter)).to.be.closeTo(Math.PI * 1.5, eps);
+  });
+
   it("should calculate the time of a given solar longitude", () => {
     const eps = 600000; // try to be accurate to 10 minutes
 
