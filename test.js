@@ -1,52 +1,43 @@
 "use strict";
-const solar = require("../lib/solar");
-const expect = require("chai").expect;
+const {expect} = require("chai");
+const astro = require("./");
 
-
-function limit_degrees(rad) {
-  const degrees = rad * 180/ Math.PI /360.0;
-  let limited = 360.0 * (degrees-Math.floor(degrees));
-  if(limited < 0) {
-    limited += 360.0;
-  }
-  return limited;
+function tan(x) {
+  return Math.tan(x * (Math.PI / 180));
 }
 
-describe("solar", () => {
-  /* FIXME: lots of methods to test */
+function angle_difference(a, b) {
+  let c = Math.abs(a - b);
+  if(c > 180) {
+    c = 360 - c;
+  }
+  return c;
+}
 
-  /* http://aa.usno.navy.mil/rstt/onedaytable
-   *  ?ID=AA&year=2006&month=3&day=20&state=NM&place=Albuquerque */
-  const ms = Date.parse("2006-03-20T19:06:28.800Z");
-  const lat = 35.05;
-  const lon = -106.62;
+describe("astro", () => {
+  it("should correctly find the sun's position at seasonal ingress", () => {
+    const spring = astro.sun(Date.parse("1999-03-21T01:46Z"));
+    const summer = astro.sun(Date.parse("1999-06-21T19:49Z"));
+    const autumn = astro.sun(Date.parse("1999-09-23T11:32Z"));
+    const winter = astro.sun(Date.parse("1999-12-22T07:44Z"));
 
-  it("should return the nearest civil dawn to a given time", () => {
-    expect(solar.dawn(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T05:45-0700"), 120000);
+    expect(spring.distance).to.be.closeTo(1.00, 0.01);
+    expect(summer.distance).to.be.closeTo(1.02, 0.01);
+    expect(autumn.distance).to.be.closeTo(1.00, 0.01);
+    expect(winter.distance).to.be.closeTo(0.98, 0.01);
+
+    expect(spring.longitude).to.be.closeTo(  0, 0.01);
+    expect(summer.longitude).to.be.closeTo( 90, 0.01);
+    expect(autumn.longitude).to.be.closeTo(180, 0.01);
+    expect(winter.longitude).to.be.closeTo(270, 0.01);
+
+    expect(spring.latitude).to.be.closeTo(0, 0.01);
+    expect(summer.latitude).to.be.closeTo(0, 0.01);
+    expect(autumn.latitude).to.be.closeTo(0, 0.01);
+    expect(winter.latitude).to.be.closeTo(0, 0.01);
   });
 
-  it("should return the nearest sunrise to a given time", () => {
-    expect(solar.rise(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T06:10-0700"), 120000);
-  });
-
-  it("should return the nearest solar transit to a given time", () => {
-    expect(solar.transit(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T12:14-0700"), 120000);
-  });
-
-  it("should return the nearest sunset to a given time", () => {
-    expect(solar.set(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T18:18-0700"), 120000);
-  });
-
-  it("should return the nearest civil dusk to a given time", () => {
-    expect(solar.dusk(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T18:43-0700"), 120000);
-  });
-
-  it("should look up the position of the sun for an observer", () => {
+  it("should correctly repeat Eratosthenes' experiment", () => {
     // OK, kids, gather round! We're going to digitally repeat Eratosthenes'
     // experiment to estimate the meridian arc using the sun.
 
@@ -55,60 +46,29 @@ describe("solar", () => {
     // (NOTE: I cheated a little here! Syene is now Aswan, and Aswan is no
     // longer on the Tropic of Cancer (since the tropics migrate about 15 m/yr).
     // So I took Aswan's longitude but used the modern latitude.)
-    const pos = solar.position(Date.parse("2019-06-21T11:50:07+0200"));
+    const sun = astro.sun(Date.parse("2019-06-21T11:50:07+0200")).equatorial();
 
-    const syene = pos.observer(23.43679, 32.899722);
-    expect(90 - syene.elevation * 180 / Math.PI).to.be.closeTo(0, 0.01);
+    const syene = sun.horizontal(23.43679, 32.899722);
+    expect(syene.altitude).to.be.closeTo(90, 0.01);
     // NOTE: Don't test azimuth here. It's a non-sense number when the sun is
     // directly overhead.
 
     // Now, I'm in Alexandria and I measure the sun's angle at solar noon using
     // a meter-long gnomon. The length of its shadow is about 1/7 m.
-    const alexandria = pos.observer(31.200000, 29.916667);
-    expect(1 / Math.tan(alexandria.elevation)).to.be.closeTo(0.14, 0.01);
+    const alexandria = sun.horizontal(31.200000, 29.916667);
+    expect(1 / tan(alexandria.altitude)).to.be.closeTo(1 / 7, 0.01);
     // Check the azimuth, just to make sure it's there and correct.
-    expect(alexandria.azimuth * 180 / Math.PI).to.be.closeTo(161.2, 1);
+    expect(angle_difference(alexandria.azimuth, 161.2)).to.be.at.most(1);
 
     // I know from merchant traders that the distance between Alexandria and
     // Syene is about ~5000 stadia~ 912km. So how big is the earth?
-    const earth = 912.017 * 2 * Math.PI / (syene.elevation - alexandria.elevation);
+    const earth = 912.017 * 360 / (syene.altitude - alexandria.altitude);
     expect(earth).to.be.closeTo(40075.017, 100);
 
     // Hey! Accurate to within a quarter of a percent! That's pretty good.
   });
 
-  const spring = Date.parse("1999-03-21T01:46Z");
-  const summer = Date.parse("1999-06-21T19:49Z");
-  const autumn = Date.parse("1999-09-23T11:32Z");
-  const winter = Date.parse("1999-12-22T07:44Z");
-
-  it("should calculate the solar longitude of a given time", () => {
-    const eps = 0.5/3600; // try to be accurate to half an arcsecond
-
-    expect(solar.longitude(spring)).to.be.closeTo(Math.PI * 0.0, eps);
-    expect(solar.longitude(summer)).to.be.closeTo(Math.PI * 0.5, eps);
-    expect(solar.longitude(autumn)).to.be.closeTo(Math.PI * 1.0, eps);
-    expect(solar.longitude(winter)).to.be.closeTo(Math.PI * 1.5, eps);
-  });
-
-  it("should calculate the time of a given solar longitude", () => {
-    const eps = 600000; // try to be accurate to 10 minutes
-
-    // Note these dates are the times of the equinoxes and solstices in 1999.
-    expect(solar.inverse_longitude(Math.PI * 0.0)).to.be.closeTo(spring, eps);
-    expect(solar.inverse_longitude(Math.PI * 0.5)).to.be.closeTo(summer, eps);
-    expect(solar.inverse_longitude(Math.PI * 1.0)).to.be.closeTo(autumn, eps);
-    expect(solar.inverse_longitude(Math.PI * 1.5)).to.be.closeTo(winter, eps);
-  });
-
-  it("should calculate the distance of the sun", () => {
-    expect(solar.distance(spring)).to.be.closeTo(1.00, 0.01);
-    expect(solar.distance(summer)).to.be.closeTo(1.02, 0.01);
-    expect(solar.distance(autumn)).to.be.closeTo(1.00, 0.01);
-    expect(solar.distance(winter)).to.be.closeTo(0.98, 0.01);
-  });
-
-  it("should calculate azimuth of the sun", () => {
+  it("should correctly find azimuth of the sun", () => {
     // https://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?form=2&body=10&year=2019&month=4&day=10&intv_mag=10&place=Salvador%2C+Brazil&lon_sign=-1&lon_deg=38&lon_min=28&lat_sign=-1&lat_deg=12&lat_min=58&tz=3&tz_sign=-1
     // Salvador, Brazil: -12.96667, -38.46667
     // April 10, 2019, 05:00 - 18:10-0300
@@ -124,9 +84,9 @@ describe("solar", () => {
     ];
     const salvador_ms = Date.parse("2019-04-10T05:00:00-0300");
     for(let i = 0; i < salvador_positions.length; i++) {
-      const azimuth = salvador_positions[i];
-      const actual = solar.azimuth(salvador_ms + 600000 * i, -12.96667, -38.46667);
-      expect(limit_degrees(actual)).to.be.closeTo(azimuth, 1);
+      const actual = astro.sun(salvador_ms + i * 600000).equatorial().horizontal(-12.96667, -38.46667).azimuth;
+      const expected = salvador_positions[i];
+      expect(angle_difference(actual, expected)).to.be.at.most(1);
     }
 
     // https://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?form=2&body=10&year=2019&month=4&day=10&intv_mag=10&place=Stockholm%2C+Sweden&lon_sign=1&lon_deg=18&lon_min=4&lat_sign=1&lat_deg=59&lat_min=19&tz=2&tz_sign=1
@@ -147,9 +107,9 @@ describe("solar", () => {
     ];
     const stockholm_ms = Date.parse("2019-04-10T04:10:00+0200");
     for(let i = 0; i < stockholm_positions.length; i++) {
-      const azimuth = stockholm_positions[i];
-      const actual = solar.azimuth(stockholm_ms + 600000 * i, 59.31667, 18.06667);
-      expect(limit_degrees(actual)).to.be.closeTo(azimuth, 1);
+      const actual = astro.sun(stockholm_ms + i * 600000).equatorial().horizontal(59.31667, 18.06667).azimuth;
+      const expected = stockholm_positions[i];
+      expect(angle_difference(actual, expected)).to.be.at.most(1);
     }
 
     // https://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?form=2&body=10&year=2019&month=4&day=10&intv_mag=10&place=Sydney%2C+Australia&lon_sign=-1&lon_deg=151&lon_min=12&lat_sign=-1&lat_deg=33&lat_min=51&tz=10&tz_sign=-1
@@ -167,9 +127,19 @@ describe("solar", () => {
     ];
     const sydney_ms = Date.parse("2019-04-10T05:20:00+1000");
     for(let i = 0; i < sydney_positions.length; i++) {
-      const azimuth = sydney_positions[i];
-      const actual = solar.azimuth(sydney_ms + 600000 * i, -33.85, 151.2);
-      expect(limit_degrees(actual)).to.be.closeTo(azimuth, 1);
+      const actual = astro.sun(sydney_ms + i * 600000).equatorial().horizontal(-33.85, 151.20).azimuth;
+      const expected = sydney_positions[i];
+      expect(angle_difference(actual, expected)).to.be.at.most(1);
     }
+  });
+
+  it("should correctly give the position of polaris", () => {
+    // polaris should be pretty close to the north celestial pole
+    const polaris_equ = astro.polaris(Date.UTC(2000));
+    expect(polaris_equ.declination).to.be.closeTo(90, 1);
+
+    // polaris should be pretty close to true north
+    const polaris_hor = polaris_equ.horizontal(40.661, -73.944);
+    expect(angle_difference(polaris_hor.azimuth, 0)).to.be.at.most(1);
   });
 });

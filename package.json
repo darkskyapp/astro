@@ -1,16 +1,15 @@
 {
   "name": "astro",
-  "version": "2.2.4",
-  "description": "Solar and lunar position calculations",
-  "main": "index.js",
+  "version": "3.0.0",
+  "description": "calculate the positions of the sun/moon/planets/stars",
   "devDependencies": {
     "@darkskyapp/eslint-config": "^1.1.1",
     "chai": "^4.2.0",
-    "eslint": "^5.14.0",
-    "eslint-plugin-node": "^8.0.1",
-    "eslint-plugin-promise": "^4.0.1",
-    "mocha": "^5.2.0",
-    "nyc": "^13.1.0"
+    "eslint": "^6.5.1",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "mocha": "^6.2.1",
+    "nyc": "^14.1.1"
   },
   "scripts": {
     "lint": "eslint .",
