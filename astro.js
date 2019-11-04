@@ -160,6 +160,62 @@ class Equatorial extends Star {
 }
 
 
+// solve Kepler's equation
+function kepler(M, e) {
+  let E = M + e * DEG * sin(M);
+
+  for(;;) {
+    const dM = M - (E - e * DEG * sin(E));
+    const dE = dM / (1 - e * cos(E));
+    E += dE;
+    if(Math.abs(dE) <= 10e-6) {
+      break;
+    }
+  }
+
+  return E;
+}
+
+function rectangular_from_kepler(a, e, I, M, w, N) {
+  const E = kepler(M, e);
+
+  const xv = a * (cos(E) - e);
+  const yv = a * Math.sqrt(1 - e * e) * sin(E);
+
+  const sin_I = sin(I);
+  const cos_I = cos(I);
+  const sin_N = sin(N);
+  const cos_N = cos(N);
+  const sin_w = sin(w);
+  const cos_w = cos(w);
+  const xh = xv * ( cos_w * cos_N - sin_w * sin_N * cos_I) +
+             yv * (-sin_w * cos_N - cos_w * sin_N * cos_I);
+  const yh = xv * ( cos_w * sin_N + sin_w * cos_N * cos_I) +
+             yv * (-sin_w * sin_N + cos_w * cos_N * cos_I);
+  const zh = xv * (sin_w * sin_I) +
+             yv * (cos_w * sin_I);
+
+  return [xh, yh, zh];
+}
+
+function rectangular_from_jpl_kepler(a, e, I, L, w1, N) {
+  return rectangular_from_kepler(a, e, I, L - w1, w1 - N, N);
+}
+
+function ecliptic_from_jpl_kepler(astro, a, e, I, L, w1, N) {
+  const [xe, ye, ze] = astro._emb;
+  const [xh, yh, zh] = rectangular_from_jpl_kepler(a, e, I, L, w1, N);
+
+  const xg = xh - xe;
+  const yg = yh - ye;
+  const zg = zh - ze;
+
+  const r = Math.sqrt(xg * xg + yg * yg + zg * zg);
+
+  return new Ecliptic(astro, atan(yg, xg), asin(zg / r), r);
+}
+
+
 class Astro {
   constructor(date) {
     const d = date / 86400000 - 10957.5;
@@ -190,6 +246,126 @@ class Astro {
     const sun = new Ecliptic(this, L, b, R);
     Object.defineProperty(this, "sun", {value: sun});
     return sun;
+  }
+
+  // https://ssd.jpl.nasa.gov/?planet_pos
+  get _emb() {
+    const d = this.j2000;
+    const emb = rectangular_from_jpl_kepler(
+        1.00000261 + (    0.00000562 / 36525) * d,
+        0.01671123 - (    0.00004392 / 36525) * d,
+       -0.00001531 - (    0.01294668 / 36525) * d,
+      100.46457166 + (35999.37244981 / 36525) * d,
+      102.93768193 + (    0.32327364 / 36525) * d,
+        0,
+    );
+    Object.defineProperty(this, "_emb", {value: emb});
+    return emb;
+  }
+
+  get mercury() {
+    const d = this.j2000;
+    const mercury = ecliptic_from_jpl_kepler(
+      this,
+        0.38709927 + (     0.00000037 / 36525) * d,
+        0.20563593 + (     0.00001906 / 36525) * d,
+        7.00497902 - (     0.00594749 / 36525) * d,
+      252.25032350 + (149472.67411175 / 36525) * d,
+       77.45779628 + (     0.16047689 / 36525) * d,
+       48.33076593 - (     0.12534081 / 36525) * d,
+    );
+    Object.defineProperty(this, "mercury", {value: mercury});
+    return mercury;
+  }
+
+  get venus() {
+    const d = this.j2000;
+    const venus = ecliptic_from_jpl_kepler(
+      this,
+        0.72333566 + (    0.00000390 / 36525) * d,
+        0.00677672 - (    0.00004107 / 36525) * d,
+        3.39467605 - (    0.00078890 / 36525) * d,
+      181.97909950 + (58517.81538729 / 36525) * d,
+      131.60246718 + (    0.00268329 / 36525) * d,
+       76.67984255 - (    0.27769418 / 36525) * d,
+    );
+    Object.defineProperty(this, "venus", {value: venus});
+    return venus;
+  }
+
+  get mars() {
+    const d = this.j2000;
+    const mars = ecliptic_from_jpl_kepler(
+      this,
+        1.52371034 + (    0.00001847 / 36525) * d,
+        0.09339410 + (    0.00007882 / 36525) * d,
+        1.84969142 - (    0.00813131 / 36525) * d,
+      355.44656795 + (19140.30268499 / 36525) * d,
+      336.05637041 + (    0.44441088 / 36525) * d,
+       49.55953891 - (    0.29257343 / 36525) * d,
+    );
+    Object.defineProperty(this, "mars", {value: mars});
+    return mars;
+  }
+
+  get jupiter() {
+    const d = this.j2000;
+    const jupiter = ecliptic_from_jpl_kepler(
+      this,
+        5.20288700 - (   0.00011607 / 36525) * d,
+        0.04838624 - (   0.00013253 / 36525) * d,
+        1.30439695 - (   0.00183714 / 36525) * d,
+       34.39644051 + (3034.74612775 / 36525) * d,
+       14.72847983 + (   0.21252668 / 36525) * d,
+      100.47390909 + (   0.20469106 / 36525) * d,
+    );
+    Object.defineProperty(this, "jupiter", {value: jupiter});
+    return jupiter;
+  }
+
+  get saturn() {
+    const d = this.j2000;
+    const saturn = ecliptic_from_jpl_kepler(
+      this,
+        9.53667594 - (   0.00125060 / 36525) * d,
+        0.05386179 - (   0.00050991 / 36525) * d,
+        2.48599187 + (   0.00193609 / 36525) * d,
+       49.95424423 + (1222.49362201 / 36525) * d,
+       92.59887831 - (   0.41897216 / 36525) * d,
+      113.66242448 - (   0.28867794 / 36525) * d,
+    );
+    Object.defineProperty(this, "saturn", {value: saturn});
+    return saturn;
+  }
+
+  get uranus() {
+    const d = this.j2000;
+    const uranus = ecliptic_from_jpl_kepler(
+      this,
+       19.18916464 - (  0.00196176 / 36525) * d,
+        0.04725744 - (  0.00004397 / 36525) * d,
+        0.77263783 - (  0.00242939 / 36525) * d,
+      313.23810451 + (428.48202785 / 36525) * d,
+      170.95427630 + (  0.40805281 / 36525) * d,
+       74.01692503 + (  0.04240589 / 36525) * d,
+    );
+    Object.defineProperty(this, "uranus", {value: uranus});
+    return uranus;
+  }
+
+  get neptune() {
+    const d = this.j2000;
+    const neptune = ecliptic_from_jpl_kepler(
+      this,
+       30.06992276 + (  0.00026291 / 36525) * d,
+        0.00859048 + (  0.00005105 / 36525) * d,
+        1.77004347 + (  0.00035372 / 36525) * d,
+      304.87997031 + (218.45945325 / 36525) * d,
+       44.96476227 - (  0.32241464 / 36525) * d,
+      131.78422574 - (  0.00508664 / 36525) * d,
+    );
+    Object.defineProperty(this, "neptune", {value: neptune});
+    return neptune;
   }
 
   // 10 brightest stars
