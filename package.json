@@ -2,6 +2,7 @@
   "name": "astro",
   "version": "3.0.0",
   "description": "calculate the positions of the sun/moon/planets/stars",
+  "main": "astro.js",
   "devDependencies": {
     "@darkskyapp/eslint-config": "^1.1.1",
     "chai": "^4.2.0",

@@ -16,10 +16,10 @@ function angle_difference(a, b) {
 
 describe("astro", () => {
   it("should correctly find the sun's position at seasonal ingress", () => {
-    const spring = astro.sun(Date.parse("1999-03-21T01:46Z"));
-    const summer = astro.sun(Date.parse("1999-06-21T19:49Z"));
-    const autumn = astro.sun(Date.parse("1999-09-23T11:32Z"));
-    const winter = astro.sun(Date.parse("1999-12-22T07:44Z"));
+    const spring = astro(Date.parse("1999-03-21T01:46Z")).sun;
+    const summer = astro(Date.parse("1999-06-21T19:49Z")).sun;
+    const autumn = astro(Date.parse("1999-09-23T11:32Z")).sun;
+    const winter = astro(Date.parse("1999-12-22T07:44Z")).sun;
 
     expect(spring.distance).to.be.closeTo(1.00, 0.01);
     expect(summer.distance).to.be.closeTo(1.02, 0.01);
@@ -46,7 +46,7 @@ describe("astro", () => {
     // (NOTE: I cheated a little here! Syene is now Aswan, and Aswan is no
     // longer on the Tropic of Cancer (since the tropics migrate about 15 m/yr).
     // So I took Aswan's longitude but used the modern latitude.)
-    const sun = astro.sun(Date.parse("2019-06-21T11:50:07+0200")).equatorial();
+    const sun = astro(Date.parse("2019-06-21T11:50:07+0200")).sun;
 
     const syene = sun.horizontal(23.43679, 32.899722);
     expect(syene.altitude).to.be.closeTo(90, 0.01);
@@ -84,7 +84,7 @@ describe("astro", () => {
     ];
     const salvador_ms = Date.parse("2019-04-10T05:00:00-0300");
     for(let i = 0; i < salvador_positions.length; i++) {
-      const actual = astro.sun(salvador_ms + i * 600000).equatorial().horizontal(-12.96667, -38.46667).azimuth;
+      const actual = astro(salvador_ms + i * 600000).sun.horizontal(-12.96667, -38.46667).azimuth;
       const expected = salvador_positions[i];
       expect(angle_difference(actual, expected)).to.be.at.most(1);
     }
@@ -107,7 +107,7 @@ describe("astro", () => {
     ];
     const stockholm_ms = Date.parse("2019-04-10T04:10:00+0200");
     for(let i = 0; i < stockholm_positions.length; i++) {
-      const actual = astro.sun(stockholm_ms + i * 600000).equatorial().horizontal(59.31667, 18.06667).azimuth;
+      const actual = astro(stockholm_ms + i * 600000).sun.horizontal(59.31667, 18.06667).azimuth;
       const expected = stockholm_positions[i];
       expect(angle_difference(actual, expected)).to.be.at.most(1);
     }
@@ -127,7 +127,7 @@ describe("astro", () => {
     ];
     const sydney_ms = Date.parse("2019-04-10T05:20:00+1000");
     for(let i = 0; i < sydney_positions.length; i++) {
-      const actual = astro.sun(sydney_ms + i * 600000).equatorial().horizontal(-33.85, 151.20).azimuth;
+      const actual = astro(sydney_ms + i * 600000).sun.horizontal(-33.85, 151.20).azimuth;
       const expected = sydney_positions[i];
       expect(angle_difference(actual, expected)).to.be.at.most(1);
     }
@@ -135,11 +135,8 @@ describe("astro", () => {
 
   it("should correctly give the position of polaris", () => {
     // polaris should be pretty close to the north celestial pole
-    const polaris_equ = astro.polaris(Date.UTC(2000));
-    expect(polaris_equ.declination).to.be.closeTo(90, 1);
-
-    // polaris should be pretty close to true north
-    const polaris_hor = polaris_equ.horizontal(40.661, -73.944);
-    expect(angle_difference(polaris_hor.azimuth, 0)).to.be.at.most(1);
+    const polaris = astro(Date.UTC(2000)).polaris.horizontal(40.661, -73.944);
+    expect(polaris.declination).to.be.closeTo(90, 1);
+    expect(angle_difference(polaris.azimuth, 0)).to.be.at.most(1);
   });
 });
