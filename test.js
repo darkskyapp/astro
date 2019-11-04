@@ -133,6 +133,23 @@ describe("astro", () => {
     }
   });
 
+  // https://www.astro.com/swisseph/ae/2000/ae_2019.pdf
+  it("should correctly give the positions of the planets", () => {
+    const a = astro(Date.UTC(2019));
+
+    // FIXME: these tolerances seem way too high to me... bug?
+    expect(angle_difference(a.sun.longitude, 280.25)).to.be.at.most(0.01);
+    // FIXME: enable this when the moon is supported again
+    // expect(angle_difference(a.moon.longitude, 222.37)).to.be.at.most(0.02);
+    expect(angle_difference(a.mercury.longitude, 263.85)).to.be.at.most(0.25);
+    expect(angle_difference(a.venus.longitude, 233.50)).to.be.at.most(0.27);
+    expect(angle_difference(a.mars.longitude, 359.93)).to.be.at.most(0.25);
+    expect(angle_difference(a.jupiter.longitude, 251.77)).to.be.at.most(0.22);
+    expect(angle_difference(a.saturn.longitude, 281.38)).to.be.at.most(0.24);
+    expect(angle_difference(a.uranus.longitude, 28.62)).to.be.at.most(0.25);
+    expect(angle_difference(a.neptune.longitude, 344.08)).to.be.at.most(0.25);
+  });
+
   it("should correctly give the position of polaris", () => {
     // polaris should be pretty close to the north celestial pole
     const polaris = astro(Date.UTC(2000)).polaris.horizontal(40.661, -73.944);
