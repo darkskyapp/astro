@@ -37,10 +37,19 @@ class EclipticHorizontal {
 }
 
 class EquatorialHorizontal {
-  constructor(equatorial, altitude, azimuth) {
+  constructor(equatorial, sin_altitude, cos_azimuth, sin_azimuth) {
     this.equatorial = equatorial;
-    this.altitude = altitude;
-    this.azimuth = azimuth;
+    this.sin_altitude = sin_altitude;
+    this.cos_azimuth = cos_azimuth;
+    this.sin_azimuth = sin_azimuth;
+  }
+
+  get altitude() {
+    return asin(this.sin_altitude);
+  }
+
+  get azimuth() {
+    return atan(this.sin_azimuth, this.cos_azimuth);
   }
 
   get right_ascension() {
@@ -121,21 +130,21 @@ class Equatorial extends Star {
     const ra = this.right_ascension;
     const dec = this.declination;
     const gmst = this.astro.gmst;
-
     const ha = gmst + lon - ra;
 
-    const sin_lat = sin(lat);
     const cos_lat = cos(lat);
-    const sin_dec = sin(dec);
+    const sin_lat = sin(lat);
     const cos_dec = cos(dec);
+    const sin_dec = sin(dec);
     const tan_dec = sin_dec / cos_dec;
-    const sin_ha = sin(ha);
     const cos_ha = cos(ha);
+    const sin_ha = sin(ha);
 
     return new EquatorialHorizontal(
       this,
-      asin(sin_lat * sin_dec + cos_lat * cos_dec * cos_ha),
-      atan(-sin_ha, cos_lat * tan_dec - sin_lat * cos_ha),
+      sin_lat * sin_dec + cos_lat * cos_dec * cos_ha,
+      cos_lat * tan_dec - sin_lat * cos_ha,
+      -sin_ha,
     );
   }
 }
