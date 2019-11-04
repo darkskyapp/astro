@@ -11,12 +11,25 @@ function sin(x) { return Math.sin(x * RAD); }
 
 
 class EclipticHorizontal {
-  constructor(ecliptic, right_ascension, declination, altitude, azimuth) {
+  constructor(ecliptic, right_ascension, sin_declination, sin_altitude, cos_azimuth, sin_azimuth) {
     this.ecliptic = ecliptic;
     this.right_ascension = right_ascension;
-    this.declination = declination;
-    this.altitude = altitude;
-    this.azimuth = azimuth;
+    this.sin_declination = sin_declination;
+    this.sin_altitude = sin_altitude;
+    this.cos_azimuth = cos_azimuth;
+    this.sin_azimuth = sin_azimuth;
+  }
+
+  get declination() {
+    return asin(this.sin_declination);
+  }
+
+  get altitude() {
+    return asin(this.sin_altitude);
+  }
+
+  get azimuth() {
+    return atan(this.sin_azimuth, this.cos_azimuth);
   }
 
   get longitude() {
@@ -112,9 +125,10 @@ class Ecliptic extends Star {
     return new EclipticHorizontal(
       this,
       ra,
-      asin(sin_dec),
-      asin(sin_lat * sin_dec + cos_lat * cos_dec * cos_ha),
-      atan(-sin_ha, cos_lat * tan_dec - sin_lat * cos_ha),
+      sin_dec,
+      sin_lat * sin_dec + cos_lat * cos_dec * cos_ha,
+      cos_lat * tan_dec - sin_lat * cos_ha,
+      -sin_ha,
     );
   }
 }
