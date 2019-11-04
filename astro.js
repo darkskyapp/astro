@@ -10,18 +10,11 @@ function cos(x) { return Math.cos(x * RAD); }
 function sin(x) { return Math.sin(x * RAD); }
 
 
-class EclipticHorizontal {
-  constructor(ecliptic, right_ascension, sin_declination, sin_altitude, cos_azimuth, sin_azimuth) {
-    this.ecliptic = ecliptic;
-    this.right_ascension = right_ascension;
-    this.sin_declination = sin_declination;
+class Horizontal {
+  constructor(sin_altitude, cos_azimuth, sin_azimuth) {
     this.sin_altitude = sin_altitude;
     this.cos_azimuth = cos_azimuth;
     this.sin_azimuth = sin_azimuth;
-  }
-
-  get declination() {
-    return asin(this.sin_declination);
   }
 
   get altitude() {
@@ -30,6 +23,19 @@ class EclipticHorizontal {
 
   get azimuth() {
     return atan(this.sin_azimuth, this.cos_azimuth);
+  }
+}
+
+class EclipticHorizontal extends Horizontal {
+  constructor(ecliptic, right_ascension, sin_declination, sin_altitude, cos_azimuth, sin_azimuth) {
+    super(sin_altitude, cos_azimuth, sin_azimuth);
+    this.ecliptic = ecliptic;
+    this.right_ascension = right_ascension;
+    this.sin_declination = sin_declination;
+  }
+
+  get declination() {
+    return asin(this.sin_declination);
   }
 
   get longitude() {
@@ -49,20 +55,10 @@ class EclipticHorizontal {
   }
 }
 
-class EquatorialHorizontal {
+class EquatorialHorizontal extends Horizontal {
   constructor(equatorial, sin_altitude, cos_azimuth, sin_azimuth) {
+    super(sin_altitude, cos_azimuth, sin_azimuth);
     this.equatorial = equatorial;
-    this.sin_altitude = sin_altitude;
-    this.cos_azimuth = cos_azimuth;
-    this.sin_azimuth = sin_azimuth;
-  }
-
-  get altitude() {
-    return asin(this.sin_altitude);
-  }
-
-  get azimuth() {
-    return atan(this.sin_azimuth, this.cos_azimuth);
   }
 
   get right_ascension() {
