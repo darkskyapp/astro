@@ -137,10 +137,9 @@ describe("astro", () => {
   it("should correctly give the positions of the planets", () => {
     const a = astro(Date.UTC(2019));
 
-    // FIXME: these tolerances seem way too high to me... bug?
     expect(angle_difference(a.sun.longitude, 280.25)).to.be.at.most(0.01);
-    // FIXME: enable this when the moon is supported again
-    // expect(angle_difference(a.moon.longitude, 222.37)).to.be.at.most(0.02);
+    expect(angle_difference(a.moon.longitude, 222.37)).to.be.at.most(0.01);
+    // FIXME: these tolerances seem way too high to me... bug?
     expect(angle_difference(a.mercury.longitude, 263.85)).to.be.at.most(0.25);
     expect(angle_difference(a.venus.longitude, 233.50)).to.be.at.most(0.27);
     expect(angle_difference(a.mars.longitude, 359.93)).to.be.at.most(0.25);
