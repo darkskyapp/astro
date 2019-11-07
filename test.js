@@ -133,20 +133,19 @@ describe("astro", () => {
     }
   });
 
-  // https://www.astro.com/swisseph/ae/2000/ae_2019.pdf
   it("should correctly give the positions of the planets", () => {
-    const a = astro(Date.UTC(2019));
+    const a = astro(Date.UTC(2010));
 
-    expect(angle_difference(a.sun.longitude, 280.25)).to.be.at.most(0.01);
-    expect(angle_difference(a.moon.longitude, 222.37)).to.be.at.most(0.01);
-    // FIXME: these tolerances seem way too high to me... bug?
-    expect(angle_difference(a.mercury.longitude, 263.85)).to.be.at.most(0.25);
-    expect(angle_difference(a.venus.longitude, 233.50)).to.be.at.most(0.27);
-    expect(angle_difference(a.mars.longitude, 359.93)).to.be.at.most(0.25);
-    expect(angle_difference(a.jupiter.longitude, 251.77)).to.be.at.most(0.22);
-    expect(angle_difference(a.saturn.longitude, 281.38)).to.be.at.most(0.24);
-    expect(angle_difference(a.uranus.longitude, 28.62)).to.be.at.most(0.25);
-    expect(angle_difference(a.neptune.longitude, 344.08)).to.be.at.most(0.25);
+    // expected values from HORIZONS: https://ssd.jpl.nasa.gov/horizons.cgi
+    expect(angle_difference(a.sun.longitude, 280.45)).to.be.at.most(0.01);
+    expect(angle_difference(a.moon.longitude, 103.24)).to.be.at.most(0.01);
+    expect(angle_difference(a.mercury.longitude, 289.00)).to.be.at.most(0.15);
+    expect(angle_difference(a.venus.longitude, 277.85)).to.be.at.most(0.15);
+    expect(angle_difference(a.mars.longitude, 138.82)).to.be.at.most(0.15);
+    expect(angle_difference(a.jupiter.longitude, 326.36)).to.be.at.most(0.15);
+    expect(angle_difference(a.saturn.longitude, 184.51)).to.be.at.most(0.27);
+    expect(angle_difference(a.uranus.longitude, 353.09)).to.be.at.most(0.15);
+    expect(angle_difference(a.neptune.longitude, 324.58)).to.be.at.most(0.15);
   });
 
   it("should correctly give the position of polaris", () => {

@@ -178,7 +178,10 @@ function kepler(M, e) {
   return E;
 }
 
-function rectangular_from_kepler(a, e, I, M, w, N) {
+function rectangular_from_kepler(a, e, I, L, w1, N) {
+  const M = L - w1;
+  const w = w1 - N;
+
   const E = kepler(M, e);
 
   const xv = a * (cos(E) - e);
@@ -200,13 +203,9 @@ function rectangular_from_kepler(a, e, I, M, w, N) {
   return [xh, yh, zh];
 }
 
-function rectangular_from_jpl_kepler(a, e, I, L, w1, N) {
-  return rectangular_from_kepler(a, e, I, L - w1, w1 - N, N);
-}
-
-function ecliptic_from_jpl_kepler(astro, a, e, I, L, w1, N) {
+function ecliptic_from_kepler(astro, a, e, I, L, w1, N) {
   const [xe, ye, ze] = astro._emb;
-  const [xh, yh, zh] = rectangular_from_jpl_kepler(a, e, I, L, w1, N);
+  const [xh, yh, zh] = rectangular_from_kepler(a, e, I, L, w1, N);
 
   const xg = xh - xe;
   const yg = yh - ye;
@@ -250,59 +249,52 @@ class Astro {
     return sun;
   }
 
-  // http://stjarnhimlen.se/comp/ppcomp.html
+  // Jean Meeus, Astronomical Algorithms, 2nd ed., ch. 47
   get moon() {
     const d = this.j2000;
+    const T = (1 / 36525) * d;
 
-    // kepler elements of the moon
-    const am = 60.2666;
-    const em = 0.054900;
-    const Im = 5.1454;
-    const Mm = 115.3654 + 13.0649929509 * d;
-    const wm = 318.0634 +  0.1643573223 * d;
-    const Nm = 125.1228 -  0.0529538083 * d;
-    const Lm = Mm + wm + Nm;
+    const Lm = 218.3164477 + 481267.88123421 * T - 0.0015786 * T * T + (1 /   538841) * T * T * T - (1 /  65194000) * T * T * T * T;
+    const D  = 297.8501921 + 445267.1114034  * T - 0.0018819 * T * T + (1 /   545868) * T * T * T - (1 / 113065000) * T * T * T * T;
+    const Ms = 357.5291092 +  35999.0502909  * T - 0.0001536 * T * T + (1 / 24490000) * T * T * T;
+    const Mm = 134.9633964 + 477198.8675055  * T + 0.0087414 * T * T + (1 /    69699) * T * T * T - (1 /  14712000) * T * T * T * T;
+    const F  =  93.2720950 + 483202.0175233  * T - 0.0036539 * T * T + (1 /  3526000) * T * T * T - (1 / 863310000) * T * T * T * T;
 
-    // kepler elements of the sun
-    const Ms = 356.0470 +  0.9856002585 * d;
-    const ws = 282.9404 +  0.0000470935 * d;
-    const Ls = Ms + ws;
+    const E = 1 - 0.002516 * T - 0.0000074 * T * T;
 
-    // rectangular coordinates
-    const [xg, yg, zg] = rectangular_from_kepler(am, em, Im, Mm, wm, Nm);
+    const L = Lm +
+                6.288774 * sin(Mm) + // equation of the center
+                1.274027 * sin(2 * D - Mm) + // evection
+                0.658314 * sin(2 * D) + // variation
+                0.213618 * sin(2 * Mm) + // equation of the center
+               -0.185116 * sin(Ms) * E + // annual equation
+               -0.114332 * sin(2 * F) + // reduction to the ecliptic
+                0.058793 * sin(2 * D - 2 * Mm) +
+                0.057066 * sin(2 * D - Ms - Mm) * E +
+                0.053322 * sin(2 * D + Mm) +
+                0.045758 * sin(2 * D - Ms) * E +
+               -0.040923 * sin(Ms - Mm) * E +
+               -0.034720 * sin(D) + // parallactic inequality
+               -0.030383 * sin(Ms + Mm) * E +
+                0.015327 * sin(2 * D - 2 * F) +
+               -0.012528 * sin(Mm + 2 * F) +
+                0.010980 * sin(Mm - 2 * F) +
+                0.010675 * sin(4 * D - Mm) +
+                0.010034 * sin(3 * Mm); // equation of the center
+    const b =   5.128122 * sin(F) +
+                0.280602 * sin(Mm + F) +
+                0.277693 * sin(Mm - F) +
+                0.173237 * sin(2 * D - F) +
+                0.055413 * sin(2 * D - Mm) +
+                0.046271 * sin(2 * D - Mm - F) +
+                0.032573 * sin(2 * D + F) +
+                0.017198 * sin(2 * Mm + F);
+    const R = 385000.56 +
+              -20.905355 * cos(Mm) +
+               -3.699111 * cos(2 * D - Mm) +
+               -2.955968 * cos(2 * D);
 
-    // ecliptic coordinates
-    let r = Math.sqrt(xg * xg + yg * yg + zg * zg);
-    let lon = atan(yg, xg);
-    let lat = asin(zg / r);
-
-    // apply corrective terms
-    const D = Lm - Ls;
-    const F = Lm - Nm;
-    lon += -1.274 * sin(Mm - 2 * D) +
-            0.658 * sin(2 * D) +
-           -0.186 * sin(Ms) +
-           -0.059 * sin(2 * Mm - 2 * D) +
-           -0.057 * sin(Mm - 2 * D + Ms) +
-            0.053 * sin(Mm + 2 * D) +
-            0.046 * sin(2 * D - Ms) +
-            0.041 * sin(Mm - Ms) +
-           -0.035 * sin(D) +
-           -0.031 * sin(Mm + Ms) +
-           -0.015 * sin(2 * F - 2 * D) +
-            0.011 * sin(Mm - 4 * D);
-    lat += -0.173 * sin(F - 2 * D) +
-           -0.055 * sin(Mm - F - 2 * D) +
-           -0.046 * sin(Mm + F - 2 * D) +
-            0.033 * sin(F + 2 * D) +
-            0.017 * sin(2 * Mm + F);
-    r   += -0.58  * cos(Mm - 2 * D) +
-           -0.46  * cos(2 * D);
-
-    // convert from earth radii to AU
-    r *= 6378.1 / 149597870.7;
-
-    const moon = new Ecliptic(this, lon, lat, r);
+    const moon = new Ecliptic(this, L, b, (1 / 149597870.7) * R);
     Object.defineProperty(this, "moon", {value: moon});
     return moon;
   }
@@ -310,7 +302,7 @@ class Astro {
   // https://ssd.jpl.nasa.gov/?planet_pos
   get _emb() {
     const d = this.j2000;
-    const emb = rectangular_from_jpl_kepler(
+    const emb = rectangular_from_kepler(
         1.00000261 + (    0.00000562 / 36525) * d,
         0.01671123 - (    0.00004392 / 36525) * d,
        -0.00001531 - (    0.01294668 / 36525) * d,
@@ -324,7 +316,7 @@ class Astro {
 
   get mercury() {
     const d = this.j2000;
-    const mercury = ecliptic_from_jpl_kepler(
+    const mercury = ecliptic_from_kepler(
       this,
         0.38709927 + (     0.00000037 / 36525) * d,
         0.20563593 + (     0.00001906 / 36525) * d,
@@ -339,7 +331,7 @@ class Astro {
 
   get venus() {
     const d = this.j2000;
-    const venus = ecliptic_from_jpl_kepler(
+    const venus = ecliptic_from_kepler(
       this,
         0.72333566 + (    0.00000390 / 36525) * d,
         0.00677672 - (    0.00004107 / 36525) * d,
@@ -354,7 +346,7 @@ class Astro {
 
   get mars() {
     const d = this.j2000;
-    const mars = ecliptic_from_jpl_kepler(
+    const mars = ecliptic_from_kepler(
       this,
         1.52371034 + (    0.00001847 / 36525) * d,
         0.09339410 + (    0.00007882 / 36525) * d,
@@ -369,7 +361,7 @@ class Astro {
 
   get jupiter() {
     const d = this.j2000;
-    const jupiter = ecliptic_from_jpl_kepler(
+    const jupiter = ecliptic_from_kepler(
       this,
         5.20288700 - (   0.00011607 / 36525) * d,
         0.04838624 - (   0.00013253 / 36525) * d,
@@ -384,7 +376,7 @@ class Astro {
 
   get saturn() {
     const d = this.j2000;
-    const saturn = ecliptic_from_jpl_kepler(
+    const saturn = ecliptic_from_kepler(
       this,
         9.53667594 - (   0.00125060 / 36525) * d,
         0.05386179 - (   0.00050991 / 36525) * d,
@@ -399,7 +391,7 @@ class Astro {
 
   get uranus() {
     const d = this.j2000;
-    const uranus = ecliptic_from_jpl_kepler(
+    const uranus = ecliptic_from_kepler(
       this,
        19.18916464 - (  0.00196176 / 36525) * d,
         0.04725744 - (  0.00004397 / 36525) * d,
@@ -414,7 +406,7 @@ class Astro {
 
   get neptune() {
     const d = this.j2000;
-    const neptune = ecliptic_from_jpl_kepler(
+    const neptune = ecliptic_from_kepler(
       this,
        30.06992276 + (  0.00026291 / 36525) * d,
         0.00859048 + (  0.00005105 / 36525) * d,
