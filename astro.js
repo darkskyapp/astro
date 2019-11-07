@@ -9,6 +9,7 @@ const DEG = 180 / PI;
 function asin(x) { return Math.asin(x) * DEG; }
 function atan(y, x) { return 180 + Math.atan2(-y, -x) * DEG; }
 function cos(x) { return Math.cos(x * RAD); }
+function frac(x) { return x - Math.floor(x); }
 function sin(x) { return Math.sin(x * RAD); }
 
 
@@ -131,6 +132,21 @@ class Ecliptic extends Star {
   }
 }
 
+class EclipticMoon extends Ecliptic {
+  constructor(astro, longitude, latitude, distance, phase_angle) {
+    super(astro, longitude, latitude, distance);
+    this.phase_angle = phase_angle;
+  }
+
+  get illumination() {
+    return 0.5 + 0.5 * cos(this.phase_angle);
+  }
+
+  get phase() {
+    return frac(0.5 - (1 / 360) * this.phase_angle);
+  }
+}
+
 class Equatorial extends Star {
   constructor(astro, right_ascension, declination) {
     super(astro);
@@ -249,7 +265,7 @@ class Astro {
     return sun;
   }
 
-  // Jean Meeus, Astronomical Algorithms, 2nd ed., ch. 47
+  // Jean Meeus, Astronomical Algorithms, 2nd ed., ch. 47-8
   get moon() {
     const d = this.j2000;
     const T = (1 / 36525) * d;
@@ -293,8 +309,14 @@ class Astro {
               -20.905355 * cos(Mm) +
                -3.699111 * cos(2 * D - Mm) +
                -2.955968 * cos(2 * D);
+    const i = 180 - D + -6.289 * sin(Mm) +
+                         2.100 * sin(Ms) +
+                        -1.274 * sin(2 * D - Mm) +
+                        -0.658 * sin(2 * D) +
+                        -0.214 * sin(2 * Mm) +
+                        -0.110 * sin(D);
 
-    const moon = new Ecliptic(this, L, b, (1 / 149597870.7) * R);
+    const moon = new EclipticMoon(this, L, b, (1 / 149597870.7) * R, i);
     Object.defineProperty(this, "moon", {value: moon});
     return moon;
   }
