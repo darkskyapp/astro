@@ -132,7 +132,7 @@ class Ecliptic extends Star {
   }
 }
 
-class EclipticMoon extends Ecliptic {
+class MoonEcliptic extends Ecliptic {
   constructor(astro, longitude, latitude, distance, phase_angle) {
     super(astro, longitude, latitude, distance);
     this.phase_angle = phase_angle;
@@ -245,20 +245,21 @@ class Astro {
   }
 
   // http://aa.usno.navy.mil/faq/docs/SunApprox.php
-  // http://mathworld.wolfram.com/Double-AngleFormulas.html
   get sun() {
     const d = this.j2000;
 
-    const g = 357.5291 + (360 / 365.259635864) * d;
-    const sin_g = sin(g);
-    const cos_g = cos(g);
-    const sin_2g = 2 * sin_g * cos_g;
-    const cos_2g = 2 * cos_g * cos_g - 1;
+    const g = 357.5291092 + 0.985600281697 * d;
 
-    const q = 280.459 + (360 / 365.2421896698) * d;
-    const L = q + 1.915 * sin_g + 0.020 * sin_2g;
+    const sin_1g = sin(g);
+    const cos_1g = cos(g);
+
+    // http://mathworld.wolfram.com/Double-AngleFormulas.html
+    const sin_2g = 2 * sin_1g * cos_1g;
+    const cos_2g = 2 * cos_1g * cos_1g - 1;
+
+    const L = 280.459 + 0.9856473599763 * d + 1.915 * sin_1g + 0.020 * sin_2g;
     const b = 0;
-    const R = 1.00014 - 0.01671 * cos_g - 0.00014 * cos_2g;
+    const R = 1.00014 - 0.01671 * cos_1g - 0.00014 * cos_2g;
 
     const sun = new Ecliptic(this, L, b, R);
     Object.defineProperty(this, "sun", {value: sun});
@@ -268,55 +269,52 @@ class Astro {
   // Jean Meeus, Astronomical Algorithms, 2nd ed., ch. 47-8
   get moon() {
     const d = this.j2000;
-    const T = (1 / 36525) * d;
 
-    const Lm = 218.3164477 + 481267.88123421 * T - 0.0015786 * T * T + (1 /   538841) * T * T * T - (1 /  65194000) * T * T * T * T;
-    const D  = 297.8501921 + 445267.1114034  * T - 0.0018819 * T * T + (1 /   545868) * T * T * T - (1 / 113065000) * T * T * T * T;
-    const Ms = 357.5291092 +  35999.0502909  * T - 0.0001536 * T * T + (1 / 24490000) * T * T * T;
-    const Mm = 134.9633964 + 477198.8675055  * T + 0.0087414 * T * T + (1 /    69699) * T * T * T - (1 /  14712000) * T * T * T * T;
-    const F  =  93.2720950 + 483202.0175233  * T - 0.0036539 * T * T + (1 /  3526000) * T * T * T - (1 / 863310000) * T * T * T * T;
+    const D = 297.8501921 + 12.19074911440  * d;
+    const g = 357.5291092 +  0.985600281697 * d;
+    const M = 134.9633964 + 13.06499295018  * d;
+    const F =  93.2720950 + 13.22935024020  * d;
 
-    const E = 1 - 0.002516 * T - 0.0000074 * T * T;
+    const sin_1D = sin(D);
+    const cos_1D = cos(D);
+    const sin_1g = sin(g);
+    const sin_1M = sin(M);
+    const cos_1M = cos(M);
+    const sin_1F = sin(F);
+    const cos_1F = cos(F);
 
-    const L = Lm +
-                6.288774 * sin(Mm) + // equation of the center
-                1.274027 * sin(2 * D - Mm) + // evection
-                0.658314 * sin(2 * D) + // variation
-                0.213618 * sin(2 * Mm) + // equation of the center
-               -0.185116 * sin(Ms) * E + // annual equation
-               -0.114332 * sin(2 * F) + // reduction to the ecliptic
-                0.058793 * sin(2 * D - 2 * Mm) +
-                0.057066 * sin(2 * D - Ms - Mm) * E +
-                0.053322 * sin(2 * D + Mm) +
-                0.045758 * sin(2 * D - Ms) * E +
-               -0.040923 * sin(Ms - Mm) * E +
-               -0.034720 * sin(D) + // parallactic inequality
-               -0.030383 * sin(Ms + Mm) * E +
-                0.015327 * sin(2 * D - 2 * F) +
-               -0.012528 * sin(Mm + 2 * F) +
-                0.010980 * sin(Mm - 2 * F) +
-                0.010675 * sin(4 * D - Mm) +
-                0.010034 * sin(3 * Mm); // equation of the center
-    const b =   5.128122 * sin(F) +
-                0.280602 * sin(Mm + F) +
-                0.277693 * sin(Mm - F) +
-                0.173237 * sin(2 * D - F) +
-                0.055413 * sin(2 * D - Mm) +
-                0.046271 * sin(2 * D - Mm - F) +
-                0.032573 * sin(2 * D + F) +
-                0.017198 * sin(2 * Mm + F);
-    const R = 385000.56 +
-              -20.905355 * cos(Mm) +
-               -3.699111 * cos(2 * D - Mm) +
-               -2.955968 * cos(2 * D);
-    const i = 180 - D + -6.289 * sin(Mm) +
-                         2.100 * sin(Ms) +
-                        -1.274 * sin(2 * D - Mm) +
-                        -0.658 * sin(2 * D) +
-                        -0.214 * sin(2 * Mm) +
-                        -0.110 * sin(D);
+    // http://mathworld.wolfram.com/Double-AngleFormulas.html
+    const sin_2D = 2 * sin_1D * cos_1D;
+    const cos_2D = 2 * cos_1D * cos_1D - 1;
+    const sin_2M = 2 * sin_1M * cos_1M;
+    const sin_2F = 2 * sin_1F * cos_1F;
 
-    const moon = new EclipticMoon(this, L, b, (1 / 149597870.7) * R, i);
+    // http://mathworld.wolfram.com/TrigonometricAdditionFormulas.html
+    const sin_2Dm1M = sin_2D * cos_1M - cos_2D * sin_1M; // sin(2D - M)
+    const sin_1Mp1F = sin_1M * cos_1F + cos_1M * sin_1F; // sin(M + F)
+    const sin_1Mm1F = sin_1M * cos_1F - cos_1M * sin_1F; // sin(M - F)
+    const sin_2Dm1F = sin_2D * cos_1F - cos_2D * sin_1F; // sin(2D - F)
+
+    const L = 218.3164477 + 13.176396474585 * d + // mean longitude
+                6.288774 * sin_1M + // equation of the center (I)
+                1.274027 * sin_2Dm1M + // evection
+                0.658314 * sin_2D - // variation
+                0.213618 * sin_2M + // equation of the center (II)
+                0.185116 * sin_1g - // annual equation
+                0.114332 * sin_2F; // reduction to the ecliptic
+    const b =   5.128122 * sin_1F +
+                0.280602 * sin_1Mp1F +
+                0.277693 * sin_1Mm1F +
+                0.173237 * sin_2Dm1F;
+    const R = 0.0025735698 - 1.397e-7 * cos_1M;
+    const i = 180 - D - 6.289 * sin_1M +
+                        2.100 * sin_1g -
+                        1.274 * sin_2Dm1M -
+                        0.658 * sin_2D -
+                        0.214 * sin_2M -
+                        0.110 * sin_1D;
+
+    const moon = new MoonEcliptic(this, L, b, R, i);
     Object.defineProperty(this, "moon", {value: moon});
     return moon;
   }
