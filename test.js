@@ -157,13 +157,14 @@ describe("astro", () => {
     expect(b.illumination).to.be.closeTo(0.6802, 0.0001);
   });
 
+  // polaris should be pretty close to the north celestial pole
   it("should correctly give the position of polaris", () => {
-    // polaris should be pretty close to the north celestial pole
     const polaris = astro(Date.UTC(2000)).polaris.horizontal(40.661, -73.944);
     expect(angle_difference(polaris.declination, 90)).to.be.at.most(1);
     expect(angle_difference(polaris.azimuth, 0)).to.be.at.most(1);
   });
 
+  // https://eco.mtk.nao.ac.jp/cgi-bin/koyomi/cande/horizontal_rhip_en.cgi
   it("should correctly give the position of procyon", () => {
     const procyon = astro(new Date("2019-11-09T00:00-0500")).procyon.horizontal(40.72, -74.02);
     expect(angle_difference(procyon.altitude, 21.49)).to.be.at.most(0.2);
