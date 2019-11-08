@@ -165,6 +165,12 @@ describe("astro", () => {
   });
 
   // https://eco.mtk.nao.ac.jp/cgi-bin/koyomi/cande/horizontal_rhip_en.cgi
+  it("should correctly give the position of sirius", () => {
+    const sirius = astro(new Date("2012-04-10T20:00+0100")).sirius.horizontal(48.87, 2.33);
+    expect(angle_difference(sirius.altitude, 20.68)).to.be.at.most(0.2);
+    expect(angle_difference(sirius.azimuth, 205.95)).to.be.at.most(0.2);
+  });
+
   it("should correctly give the position of procyon", () => {
     const procyon = astro(new Date("2019-11-09T00:00-0500")).procyon.horizontal(40.72, -74.02);
     expect(angle_difference(procyon.altitude, 21.49)).to.be.at.most(0.2);
