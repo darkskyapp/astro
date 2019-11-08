@@ -267,6 +267,7 @@ class Astro {
   }
 
   // Jean Meeus, Astronomical Algorithms, 2nd ed., ch. 47-8
+  // NOTE: This has been simplified down to terms >=0.1°.
   get moon() {
     const d = this.j2000;
 
