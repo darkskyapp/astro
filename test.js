@@ -148,6 +148,15 @@ describe("astro", () => {
     expect(angle_difference(a.neptune.longitude, 324.58)).to.be.at.most(0.15);
   });
 
+  it("should correctly give the moon's phase", () => {
+    const a = astro(new Date("2014-02-17T00:00-0500")).moon;
+    expect(a.illumination).to.be.closeTo(0.955, 0.001);
+    expect(a.phase).to.be.closeTo(0.568, 0.001);
+
+    const b = astro(new Date("1992-04-12")).moon;
+    expect(b.illumination).to.be.closeTo(0.6802, 0.0001);
+  });
+
   it("should correctly give the position of polaris", () => {
     // polaris should be pretty close to the north celestial pole
     const polaris = astro(Date.UTC(2000)).polaris.horizontal(40.661, -73.944);
