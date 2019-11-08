@@ -321,6 +321,7 @@ class Astro {
   }
 
   // https://ssd.jpl.nasa.gov/?planet_pos
+  // ftp://ssd.jpl.nasa.gov/pub/eph/planets/ioms/ExplSupplChap8.pdf
   get _emb() {
     const d = this.j2000;
     const emb = rectangular_from_kepler(
