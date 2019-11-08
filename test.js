@@ -133,10 +133,10 @@ describe("astro", () => {
     }
   });
 
+  // https://ssd.jpl.nasa.gov/horizons.cgi
   it("should correctly give the positions of the planets", () => {
     const a = astro(Date.UTC(2010));
 
-    // expected values from HORIZONS: https://ssd.jpl.nasa.gov/horizons.cgi
     expect(angle_difference(a.sun.longitude, 280.45)).to.be.at.most(0.01);
     expect(angle_difference(a.moon.longitude, 103.24)).to.be.at.most(0.01);
     expect(angle_difference(a.mercury.longitude, 289.00)).to.be.at.most(0.15);
