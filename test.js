@@ -165,6 +165,8 @@ describe("astro", () => {
   });
 
   // https://eco.mtk.nao.ac.jp/cgi-bin/koyomi/cande/horizontal_rhip_en.cgi
+  // NOTE: I'm not worried about being off by 0.2°---the above website has
+  // different positions than the sources I used (by about 0.2°).
   it("should correctly give the position of sirius", () => {
     const sirius = astro(new Date("2012-04-10T20:00+0100")).sirius.horizontal(48.87, 2.33);
     expect(angle_difference(sirius.altitude, 20.68)).to.be.at.most(0.2);
