@@ -122,7 +122,7 @@ class Ecliptic extends Star {
 
     // apply topocentric correction
     // http://stjarnhimlen.se/comp/ppcomp.html#13
-    const par = asin(0.00004263521 / R);
+    const par = asin(4.263521e-5 / R);
     const alt_topoc = alt_geoc - par * cos(alt_geoc);
 
     return new EclipticHorizontal(
