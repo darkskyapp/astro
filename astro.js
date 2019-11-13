@@ -14,14 +14,10 @@ function sin(x) { return Math.sin(x * RAD); }
 
 
 class Horizontal {
-  constructor(sin_altitude, cos_azimuth, sin_azimuth) {
-    this.sin_altitude = sin_altitude;
+  constructor(altitude, cos_azimuth, sin_azimuth) {
+    this.altitude = altitude;
     this.cos_azimuth = cos_azimuth;
     this.sin_azimuth = sin_azimuth;
-  }
-
-  get altitude() {
-    return asin(this.sin_altitude);
   }
 
   get azimuth() {
@@ -30,8 +26,8 @@ class Horizontal {
 }
 
 class EclipticHorizontal extends Horizontal {
-  constructor(ecliptic, right_ascension, sin_declination, sin_altitude, cos_azimuth, sin_azimuth) {
-    super(sin_altitude, cos_azimuth, sin_azimuth);
+  constructor(ecliptic, right_ascension, sin_declination, altitude, cos_azimuth, sin_azimuth) {
+    super(altitude, cos_azimuth, sin_azimuth);
     this.ecliptic = ecliptic;
     this.right_ascension = right_ascension;
     this.sin_declination = sin_declination;
@@ -59,8 +55,8 @@ class EclipticHorizontal extends Horizontal {
 }
 
 class EquatorialHorizontal extends Horizontal {
-  constructor(equatorial, sin_altitude, cos_azimuth, sin_azimuth) {
-    super(sin_altitude, cos_azimuth, sin_azimuth);
+  constructor(equatorial, altitude, cos_azimuth, sin_azimuth) {
+    super(altitude, cos_azimuth, sin_azimuth);
     this.equatorial = equatorial;
   }
 
@@ -99,6 +95,7 @@ class Ecliptic extends Star {
   horizontal(lat, lon) {
     const ecl_lon = this.longitude;
     const ecl_lat = this.latitude;
+    const R = this.distance;
     const ecl = this.astro.obliquity;
     const gmst = this.astro.gmst;
 
@@ -121,11 +118,18 @@ class Ecliptic extends Star {
     const sin_ha = sin(ha);
     const cos_ha = cos(ha);
 
+    const alt_geoc = asin(sin_lat * sin_dec + cos_lat * cos_dec * cos_ha);
+
+    // apply topocentric correction
+    // http://stjarnhimlen.se/comp/ppcomp.html#13
+    const par = asin(0.00004263521 / R);
+    const alt_topoc = alt_geoc - par * cos(alt_geoc);
+
     return new EclipticHorizontal(
       this,
       ra,
       sin_dec,
-      sin_lat * sin_dec + cos_lat * cos_dec * cos_ha,
+      alt_topoc,
       cos_lat * tan_dec - sin_lat * cos_ha,
       -sin_ha,
     );
@@ -170,7 +174,7 @@ class Equatorial extends Star {
 
     return new EquatorialHorizontal(
       this,
-      sin_lat * sin_dec + cos_lat * cos_dec * cos_ha,
+      asin(sin_lat * sin_dec + cos_lat * cos_dec * cos_ha),
       cos_lat * tan_dec - sin_lat * cos_ha,
       -sin_ha,
     );
