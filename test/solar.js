@@ -23,27 +23,27 @@ describe("solar", () => {
 
   it("should return the nearest civil dawn to a given time", () => {
     expect(solar.dawn(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T05:45-0700"), 120000);
+      to.be.closeTo(Date.parse("2006-03-20T05:45-0700"), 60000);
   });
 
   it("should return the nearest sunrise to a given time", () => {
     expect(solar.rise(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T06:10-0700"), 120000);
+      to.be.closeTo(Date.parse("2006-03-20T06:10-0700"), 60000);
   });
 
   it("should return the nearest solar transit to a given time", () => {
     expect(solar.transit(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T12:14-0700"), 120000);
+      to.be.closeTo(Date.parse("2006-03-20T12:14-0700"), 60000);
   });
 
   it("should return the nearest sunset to a given time", () => {
     expect(solar.set(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T18:18-0700"), 120000);
+      to.be.closeTo(Date.parse("2006-03-20T18:18-0700"), 60000);
   });
 
   it("should return the nearest civil dusk to a given time", () => {
     expect(solar.dusk(ms, lat, lon)).
-      to.be.closeTo(Date.parse("2006-03-20T18:43-0700"), 120000);
+      to.be.closeTo(Date.parse("2006-03-20T18:43-0700"), 60000);
   });
 
   it("should look up the position of the sun for an observer", () => {
@@ -55,7 +55,7 @@ describe("solar", () => {
     // (NOTE: I cheated a little here! Syene is now Aswan, and Aswan is no
     // longer on the Tropic of Cancer (since the tropics migrate about 15 m/yr).
     // So I took Aswan's longitude but used the modern latitude.)
-    const pos = solar.position(Date.parse("2019-06-21T11:50:07+0200"));
+    const pos = solar.position(Date.parse("2019-06-21T11:49:03+0200"));
 
     const syene = pos.observer(23.43679, 32.899722);
     expect(90 - syene.elevation * 180 / Math.PI).to.be.closeTo(0, 0.01);
