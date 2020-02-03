@@ -89,7 +89,7 @@ describe("lunar", () => {
     }
     else {
       expect(
-        calculated_value
+        calculated_value,
       ).to.be.closeTo(result, 10 * 60 * 1000); // Allow error of 10min
     }
   }
