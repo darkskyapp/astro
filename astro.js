@@ -39,6 +39,13 @@ function riseset(planet, lat, lon, h0, direction) {
     const cos_lha = (sin_h0 - sin_lat * sin_dec) / (cos_lat * cos_dec);
     // FIXME: would be nicer to try hunting for the appropriate time
     if(Math.abs(cos_lha) > 1) {
+      // restore state
+      planet.time = time;
+      planet.x = x;
+      planet.y = y;
+      planet.z = z;
+
+      // bail
       return NaN;
     }
 
@@ -188,14 +195,17 @@ class Planet {
     return this.time - 3590170.4 * ha;
   }
 
+  // timestamp
   ascend(lat, lon, h0=0) {
     return riseset(this, lat, lon, h0, -1);
   }
 
+  // timestamp
   descend(lat, lon, h0=0) {
     return riseset(this, lat, lon, h0, +1);
   }
 
+  // object
   observer(lat, lon) {
     return new Observer(this, lat, lon);
   }
