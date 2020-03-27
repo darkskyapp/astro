@@ -247,14 +247,59 @@ class Sun extends Planet {
 
 class Moon extends Planet {
   setTime(time) {
+    const d = 4.847230 + 2462600814e-18 * time;
+    const f = 3.711908 + 2672404162e-18 * time;
+    const l = 4.456050 + 2639203053e-18 * time;
+    const g = 6.245046 +  199096875e-18 * time;
+
     super.setTime(
       time,
-      0.002563,
-      0.055546,
-      0.090001,
-      3.455090 + 2661707199e-18 * time,
-      5.282226 +   22504146e-18 * time,
-      6.026367 -   10696962e-18 * time,
+      0.002563 + 0.000023 * Math.cos(2 * d),
+      0.055546 + 0.014216 * Math.cos(2 * d - l)
+               + 0.008551 * Math.cos(2 * d - 2 * l)
+               - 0.001383 * Math.cos(l)
+               + 0.001356 * Math.cos(2 * d + l)
+               - 0.001147 * Math.cos(4 * d - 3 * l)
+               - 0.000914 * Math.cos(4 * d - 2 * l)
+               + 0.000869 * Math.cos(2 * d - g - l)
+               - 0.000627 * Math.cos(2 * d)
+               - 0.000394 * Math.cos(4 * d - 4 * l)
+               + 0.000282 * Math.cos(2 * d - g - 2 * l)
+               - 0.000279 * Math.cos(d - l)
+               - 0.000236 * Math.cos(2 * l)
+               + 0.000231 * Math.cos(4 * d)
+               + 0.000229 * Math.cos(6 * d - 4 * l)
+               - 0.000201 * Math.cos(2 * l - 2 * f),
+      0.090001 + 0.002357 * Math.cos(2 * d - 2 * f)
+               - 0.000195 * Math.cos(2 * d)
+               + 0.000182 * Math.cos(2 * f)
+               + 0.000125 * Math.cos(2 * l - 2 * f)
+               + 0.000097 * Math.cos(2 * d - g - 2 * f),
+      3.455090 + 2661707199e-18 * time - 0.016158 * Math.sin(2 * d)
+                                       + 0.005805 * Math.sin(2 * d - l)
+                                       - 0.003212 * Math.sin(g)
+                                       + 0.001921 * Math.sin(l)
+                                       - 0.001057 * Math.sin(2 * d - g),
+      5.282226 +   22504146e-18 * time - 0.269600 * Math.sin(2 * d - l)
+                                       - 0.168284 * Math.sin(2 * d - 2 * l)
+                                       - 0.047473 * Math.sin(l)
+                                       + 0.045500 * Math.sin(4 * d - 3 * l)
+                                       + 0.036385 * Math.sin(4 * d - 2 * l)
+                                       + 0.025782 * Math.sin(2 * d + l)
+                                       + 0.016891 * Math.sin(4 * d - 4 * l)
+                                       - 0.016566 * Math.sin(2 * d - g - l)
+                                       - 0.012266 * Math.sin(6 * d - 4 * l)
+                                       - 0.011519 * Math.sin(2 * d)
+                                       - 0.010060 * Math.sin(2 * d - 3 * l)
+                                       - 0.009129 * Math.sin(2 * l)
+                                       - 0.008416 * Math.sin(6 * d - 5 * l)
+                                       + 0.007883 * Math.sin(g)
+                                       - 0.006686 * Math.sin(6 * d - 3 * l),
+      6.026367 -   10696962e-18 * time - 0.026141 * Math.sin(2 * d - 2 * f)
+                                       - 0.002618 * Math.sin(g)
+                                       - 0.002138 * Math.sin(2 * d)
+                                       + 0.002051 * Math.sin(2 * f)
+                                       - 0.001396 * Math.sin(2 * l - 2 * f),
     );
   }
 
