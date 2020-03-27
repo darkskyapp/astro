@@ -318,6 +318,7 @@ class Planet extends Luminary {
   setTime(time, a, e, i, λ, π, Ω) {
     super.setTime(time, a, e, i, λ, π, Ω);
 
+    // planets orbit the sun, not the earth
     // FIXME: Would be good to cache a sun object rather than making new ones.
     const {x, y, z} = new Sun(time);
     this.x += x;
@@ -340,6 +341,21 @@ class Mercury extends Planet {
   }
 }
 
+class Venus extends Planet {
+  setTime(time) {
+    super.setTime(
+      time,
+      0.723330,
+      0.006786 -        15e-18 * time,
+      0.059243 +         6e-18 * time,
+      4.646365 + 323647217e-18 * time,
+      2.288878 +      7755e-18 * time,
+      1.333599 +      4983e-18 * time,
+    );
+  }
+}
+
 exports.sun     = time => new Sun    (time);
 exports.moon    = time => new Moon   (time);
 exports.mercury = time => new Mercury(time);
+exports.venus   = time => new Venus  (time);
