@@ -369,8 +369,24 @@ class Mars extends Planet {
   }
 }
 
+class Jupiter extends Planet {
+  setTime(time) {
+    // FIXME: add periodic terms
+    super.setTime(
+      time,
+      5.202603,
+      0.048449 +       52e-18 * time,
+      0.022775 -       30e-18 * time,
+      3.551060 + 16792621e-18 * time,
+      0.241683 +     8919e-18 * time,
+      1.748089 +     5647e-18 * time,
+    );
+  }
+}
+
 exports.sun     = time => new Sun    (time);
 exports.moon    = time => new Moon   (time);
 exports.mercury = time => new Mercury(time);
 exports.venus   = time => new Venus  (time);
 exports.mars    = time => new Mars   (time);
+exports.jupiter = time => new Jupiter(time);
