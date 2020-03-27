@@ -15,7 +15,7 @@ function gmst(time) {
 // http://stjarnhimlen.se/comp/ppcomp.html#13
 // degrees
 function parallax(distance) {
-  return 2443e-6 / distance;
+  return 0.002443 / distance;
 }
 
 class Observer {
@@ -46,7 +46,7 @@ class Observer {
   }
 }
 
-class Planet {
+class Luminary {
   constructor(time) {
     this.setTime(time);
   }
@@ -215,7 +215,7 @@ class Planet {
 // The Kepler element formulae below are all from J. L. Simon _et. al._,
 // "Numerical expressions for precession formulae and mean elements for the
 // Moon and planets," 1992.
-class Sun extends Planet {
+class Sun extends Luminary {
   setTime(time) {
     super.setTime(
       time,
@@ -245,7 +245,7 @@ class Sun extends Planet {
   }
 }
 
-class Moon extends Planet {
+class Moon extends Luminary {
   setTime(time) {
     const d = 4.847230 + 2462600814e-18 * time;
     const f = 3.711908 + 2672404162e-18 * time;
@@ -314,5 +314,32 @@ class Moon extends Planet {
   }
 }
 
-exports.sun  = time => new Sun (time);
-exports.moon = time => new Moon(time);
+class Planet extends Luminary {
+  setTime(time, a, e, i, λ, π, Ω) {
+    super.setTime(time, a, e, i, λ, π, Ω);
+
+    // FIXME: Would be good to cache a sun object rather than making new ones.
+    const {x, y, z} = new Sun(time);
+    this.x += x;
+    this.y += y;
+    this.z += z;
+  }
+}
+
+class Mercury extends Planet {
+  setTime(time) {
+    super.setTime(
+      time,
+      0.387098,
+      0.205626 +         6e-18 * time,
+      0.122251 +        10e-18 * time,
+      0.873228 + 826683495e-18 * time,
+      1.343715 +      8608e-18 * time,
+      0.837323 +      6560e-18 * time,
+    );
+  }
+}
+
+exports.sun     = time => new Sun    (time);
+exports.moon    = time => new Moon   (time);
+exports.mercury = time => new Mercury(time);
