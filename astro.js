@@ -212,6 +212,19 @@ class Luminary {
   }
 }
 
+class Planet extends Luminary {
+  setTime(time, a, e, i, λ, π, Ω) {
+    super.setTime(time, a, e, i, λ, π, Ω);
+
+    // planets orbit the sun, not the earth
+    // FIXME: Would be good to cache a sun object rather than making new ones.
+    const {x, y, z} = new Sun(time);
+    this.x += x;
+    this.y += y;
+    this.z += z;
+  }
+}
+
 // The Kepler element formulae below are all from J. L. Simon _et. al._,
 // "Numerical expressions for precession formulae and mean elements for the
 // Moon and planets," 1992.
@@ -314,19 +327,6 @@ class Moon extends Luminary {
   }
 }
 
-class Planet extends Luminary {
-  setTime(time, a, e, i, λ, π, Ω) {
-    super.setTime(time, a, e, i, λ, π, Ω);
-
-    // planets orbit the sun, not the earth
-    // FIXME: Would be good to cache a sun object rather than making new ones.
-    const {x, y, z} = new Sun(time);
-    this.x += x;
-    this.y += y;
-    this.z += z;
-  }
-}
-
 class Mercury extends Planet {
   setTime(time) {
     super.setTime(
@@ -355,7 +355,22 @@ class Venus extends Planet {
   }
 }
 
+class Mars extends Planet {
+  setTime(time) {
+    super.setTime(
+      time,
+      1.523679,
+      0.093374 +        29e-18 * time,
+      0.032287 -         3e-18 * time,
+      0.225575 + 105865347e-18 * time,
+      5.855718 +     10182e-18 * time,
+      0.860910 +      4270e-18 * time,
+    );
+  }
+}
+
 exports.sun     = time => new Sun    (time);
 exports.moon    = time => new Moon   (time);
 exports.mercury = time => new Mercury(time);
 exports.venus   = time => new Venus  (time);
+exports.mars    = time => new Mars   (time);
