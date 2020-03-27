@@ -48,7 +48,7 @@ describe("astro", () => {
     assert_close(winter.distance, 0.984, 0.001);
   });
 
-  it("should correctly determine rise/noon/set times (a)", () => {
+  it("should correctly determine dawn/sunrise/noon/sunset/dusk times for Albuquerque", () => {
     const sun = astro.sun(Date.parse("2006-03-20T19:06:28.800Z"));
     const lat =   35.05;
     const lon = -106.62;
@@ -56,31 +56,31 @@ describe("astro", () => {
     assert_close(
       sun.dawn(lat, lon),
       Date.parse("2006-03-20T05:45-0700"),
-      120000,
+      90000,
     );
     assert_close(
       sun.rise(lat, lon),
       Date.parse("2006-03-20T06:10-0700"),
-      120000,
+      90000,
     );
     assert_close(
       sun.transit(lat, lon),
       Date.parse("2006-03-20T12:14-0700"),
-      120000,
+      90000,
     );
     assert_close(
       sun.set(lat, lon),
       Date.parse("2006-03-20T18:18-0700"),
-      120000,
+      90000,
     );
     assert_close(
       sun.dusk(lat, lon),
       Date.parse("2006-03-20T18:43-0700"),
-      120000,
+      90000,
     );
   });
 
-  it("should correctly determine rise/noon/set times (b)", () => {
+  it("should correctly determine sunrise/noon/sunset times for Albany", () => {
     const sun = astro.sun(Date.parse("2020-03-25T17:23-0400"));
     const lat =  42.6525;
     const lon = -73.7572;
@@ -88,21 +88,21 @@ describe("astro", () => {
     assert_close(
       sun.rise(lat, lon),
       Date.parse("2020-03-25T06:48-0400"),
-      60000,
+      90000,
     );
     assert_close(
       sun.transit(lat, lon),
       Date.parse("2020-03-25T13:00-0400"),
-      60000,
+      90000,
     );
     assert_close(
       sun.set(lat, lon),
       Date.parse("2020-03-25T19:13-0400"),
-      60000,
+      90000,
     );
   });
 
-  it("should correctly determine azimuth", () => {
+  it("should correctly determine solar azimuth", () => {
     // https://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?form=2&body=10&year=2019&month=4&day=10&intv_mag=10&place=Salvador%2C+Brazil&lon_sign=-1&lon_deg=38&lon_min=28&lat_sign=-1&lat_deg=12&lat_min=58&tz=3&tz_sign=-1
     // Salvador, Brazil: -12.96667, -38.46667
     // April 10, 2019, 05:00 - 18:10-0300
@@ -171,5 +171,40 @@ describe("astro", () => {
         1,
       );
     }
+  });
+
+  it("should correctly return moon rise/transit/set times for Albuquerque", () => {
+    const moon = astro.moon(Date.parse("2006-03-20T19:06:28.800Z"));
+    const lat =   35.05;
+    const lon = -106.62;
+
+    assert_close(
+      moon.rise(lat, lon),
+      Date.parse("2006-03-21T00:16-0700"),
+      90000,
+    );
+    assert_close(
+      moon.transit(lat, lon),
+      Date.parse("2006-03-21T05:02-0700"),
+      90000,
+    );
+    assert_close(
+      moon.rise(lat, lon),
+      Date.parse("2006-03-21T09:45-0700"),
+      90000,
+    );
+  });
+
+  it("should return the ecliptic longitude of every planet", () => {
+    const time = Date.parse("2020-03-23T19:20Z");
+    assert_angle(astro.sun    (time).longitude,   3.62, 1/60);
+    assert_angle(astro.moon   (time).longitude, 357.21, 2/60);
+    assert_angle(astro.mercury(time).longitude, 335.86, 1/60);
+    assert_angle(astro.venus  (time).longitude,  49.62, 1/60);
+    assert_angle(astro.mars   (time).longitude, 295.12, 1/60);
+    assert_angle(astro.jupiter(time).longitude, 293.30, 2/60);
+    assert_angle(astro.saturn (time).longitude, 300.12, 2/60);
+    assert_angle(astro.uranus (time).longitude,  34.73, 2/60);
+    assert_angle(astro.neptune(time).longitude, 348.97, 1/60);
   });
 });

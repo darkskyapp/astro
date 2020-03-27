@@ -13,63 +13,9 @@ function gmst(time) {
 }
 
 // http://stjarnhimlen.se/comp/ppcomp.html#13
-// radians
+// degrees
 function parallax(distance) {
-  return 4263e-8 / distance;
-}
-
-// http://stjarnhimlen.se/comp/riset.html
-// timestamp
-function riseset(planet, lat, lon, h0, direction) {
-  // save state
-  const {time, x, y, z} = planet;
-
-  const sin_lat = Math.sin(lat * (Math.PI / 180));
-  const cos_lat = Math.cos(lat * (Math.PI / 180));
-
-  // NOTE: we assume the planet's parallax is fixed. it technically isn't, but
-  // the error involved is insignificant.
-  const sin_h0 = Math.sin(h0 * (Math.PI / 180) - parallax(planet.distance));
-
-  for(;;) {
-    // solve the sunrise equation
-    const dec = planet.declination;
-    const sin_dec = Math.sin(dec * (Math.PI / 180));
-    const cos_dec = Math.cos(dec * (Math.PI / 180));
-    const cos_lha = (sin_h0 - sin_lat * sin_dec) / (cos_lat * cos_dec);
-    // FIXME: would be nicer to try hunting for the appropriate time
-    if(Math.abs(cos_lha) > 1) {
-      // restore state
-      planet.time = time;
-      planet.x = x;
-      planet.y = y;
-      planet.z = z;
-
-      // bail
-      return NaN;
-    }
-
-    // calculate the candidate rise or set time
-    const riseset = planet.transit(lon) + 13713440.9 * direction * Math.acos(cos_lha);
-
-    // if the candidate is far enough from the current time, we might be
-    // inaccurate. update the planet's time, and iterate
-    if(Math.abs(riseset - planet.time) >= 60000) {
-      planet.set(riseset);
-      continue;
-    }
-
-    // otherwise, we're done!
-
-    // restore state
-    planet.time = time;
-    planet.x = x;
-    planet.y = y;
-    planet.z = z;
-
-    // return
-    return riseset;
-  }
+  return 2443e-6 / distance;
 }
 
 class Observer {
@@ -92,7 +38,7 @@ class Observer {
 
     // apply parallax for topocentric horizontal coordinates
     // http://stjarnhimlen.se/comp/ppcomp.html#13
-    const altitude = (Math.asin(sin_altitude) - parallax(planet.distance) * cos_altitude) * (180 / Math.PI);
+    const altitude = Math.asin(sin_altitude) * (180 / Math.PI) - parallax(planet.distance) * cos_altitude;
 
     // initialize this object
     this.altitude = altitude;
@@ -102,12 +48,12 @@ class Observer {
 
 class Planet {
   constructor(time) {
-    this.set(time);
+    this.setTime(time);
   }
 
   // https://ssd.jpl.nasa.gov/?planet_pos
   // abstract
-  set(time, a, e, i, λ, π, Ω) {
+  setTime(time, a, e, i, λ, π, Ω) {
     const M = λ - π;
     const w = π - Ω;
 
@@ -187,22 +133,77 @@ class Planet {
   }
 
   // http://stjarnhimlen.se/comp/riset.html
+  // NOTE: latitude not used, but kept for consistency with rise/set
   // timestamp
-  transit(lon) {
+  transit(lat, lon) {
     let ha = this.hour_angle(lon);
     if(ha > 12) { ha -= 24; }
 
     return this.time - 3590170.4 * ha;
   }
 
+  // http://stjarnhimlen.se/comp/riset.html
   // timestamp
-  ascend(lat, lon, h0=0) {
-    return riseset(this, lat, lon, h0, -1);
+  riseset(lat, lon, h0, direction) {
+    // save state
+    const {time, x, y, z} = this;
+
+    const sin_lat = Math.sin(lat * (Math.PI / 180));
+    const cos_lat = Math.cos(lat * (Math.PI / 180));
+
+    const sin_h0 = Math.sin(h0 * (Math.PI / 180));
+
+    for(;;) {
+      // solve the sunrise equation
+      const dec = this.declination;
+      const sin_dec = Math.sin(dec * (Math.PI / 180));
+      const cos_dec = Math.cos(dec * (Math.PI / 180));
+      const cos_lha = (sin_h0 - sin_lat * sin_dec) / (cos_lat * cos_dec);
+      // FIXME: would be nicer to try hunting for the appropriate time
+      if(Math.abs(cos_lha) > 1) {
+        // restore state
+        this.time = time;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+
+        // bail
+        return NaN;
+      }
+
+      // calculate the candidate rise or set time
+      const riseset = this.transit(lat, lon) + 13713440.9 * direction * Math.acos(cos_lha);
+
+      // if the candidate is far enough from the current time, we might be
+      // inaccurate. update the this's time, and iterate
+      if(Math.abs(riseset - this.time) >= 60000) {
+        this.setTime(riseset);
+        continue;
+      }
+
+      // otherwise, we're done!
+
+      // restore state
+      this.time = time;
+      this.x = x;
+      this.y = y;
+      this.z = z;
+
+      // return
+      return riseset;
+    }
   }
 
+  // convenience method for the above
   // timestamp
-  descend(lat, lon, h0=0) {
-    return riseset(this, lat, lon, h0, +1);
+  rise(lat, lon) {
+    return this.riseset(lat, lon, 0, -1);
+  }
+
+  // convenience method for the above
+  // timestamp
+  set(lat, lon) {
+    return this.riseset(lat, lon, 0, +1);
   }
 
   // object
@@ -215,8 +216,8 @@ class Planet {
 // "Numerical expressions for precession formulae and mean elements for the
 // Moon and planets," 1992.
 class Sun extends Planet {
-  set(time) {
-    super.set(
+  setTime(time) {
+    super.setTime(
       time,
       1.000001,
       0.016721 -        13e-18 * time,
@@ -227,13 +228,46 @@ class Sun extends Planet {
     );
   }
 
-  ascend(lat, lon, h0=-0.833) {
-    return super.ascend(lat, lon, h0);
+  dawn(lat, lon) {
+    return this.riseset(lat, lon, -6, -1);
   }
 
-  descend(lat, lon, h0=-0.833) {
-    return super.descend(lat, lon, h0);
+  rise(lat, lon) {
+    return this.riseset(lat, lon, -0.833, -1);
+  }
+
+  set(lat, lon) {
+    return this.riseset(lat, lon, -0.833, +1);
+  }
+
+  dusk(lat, lon) {
+    return this.riseset(lat, lon, -6, +1);
   }
 }
 
-exports.sun = time => new Sun(time);
+class Moon extends Planet {
+  setTime(time) {
+    super.setTime(
+      time,
+      0.002563,
+      0.055546,
+      0.090001,
+      3.455090 + 2661707199e-18 * time,
+      5.282226 +   22504146e-18 * time,
+      6.026367 -   10696962e-18 * time,
+    );
+  }
+
+  // http://stjarnhimlen.se/comp/riset.html#4
+  rise(lat, lon) {
+    return this.riseset(lat, lon, -0.583 - parallax(this.distance), -1);
+  }
+
+  // http://stjarnhimlen.se/comp/riset.html#4
+  set(lat, lon) {
+    return this.riseset(lat, lon, -0.583 - parallax(this.distance), +1);
+  }
+}
+
+exports.sun  = time => new Sun (time);
+exports.moon = time => new Moon(time);
