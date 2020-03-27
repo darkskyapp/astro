@@ -384,9 +384,25 @@ class Jupiter extends Planet {
   }
 }
 
+class Saturn extends Planet {
+  setTime(time) {
+    // FIXME: add periodic terms
+    super.setTime(
+      time,
+      9.554910 -       1e-18 * time,
+      0.055652 -     110e-18 * time,
+      0.043459 -      21e-18 * time,
+      0.750913 + 6766768e-18 * time,
+      1.613873 +   10861e-18 * time,
+      1.979245 +    4851e-18 * time,
+    );
+  }
+}
+
 exports.sun     = time => new Sun    (time);
 exports.moon    = time => new Moon   (time);
 exports.mercury = time => new Mercury(time);
 exports.venus   = time => new Venus  (time);
 exports.mars    = time => new Mars   (time);
 exports.jupiter = time => new Jupiter(time);
+exports.saturn  = time => new Saturn (time);
