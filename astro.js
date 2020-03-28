@@ -399,6 +399,36 @@ class Saturn extends Planet {
   }
 }
 
+class Uranus extends Planet {
+  setTime(time) {
+    // FIXME: add periodic terms
+    super.setTime(
+      time,
+      19.218446,
+       0.046389 -       9e-18 * time,
+       0.013491 +       4e-18 * time,
+       3.230531 + 2377412e-18 * time,
+       3.011729 +    8221e-18 * time,
+       1.288919 +    2882e-18 * time,
+    );
+  }
+}
+
+class Neptune extends Planet {
+  setTime(time) {
+    // FIXME: add periodic terms
+    super.setTime(
+      time,
+      30.110387,
+       0.009454 +       2e-18 * time,
+       0.030940 -      51e-18 * time,
+       4.160580 + 1216090e-18 * time,
+       0.832389 +    7888e-18 * time,
+       2.294295 +    6096e-18 * time,
+    );
+  }
+}
+
 exports.sun     = time => new Sun    (time);
 exports.moon    = time => new Moon   (time);
 exports.mercury = time => new Mercury(time);
@@ -406,3 +436,5 @@ exports.venus   = time => new Venus  (time);
 exports.mars    = time => new Mars   (time);
 exports.jupiter = time => new Jupiter(time);
 exports.saturn  = time => new Saturn (time);
+exports.uranus  = time => new Uranus (time);
+exports.neptune = time => new Neptune(time);
