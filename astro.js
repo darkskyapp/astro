@@ -38,6 +38,7 @@ class Observer {
 
     // apply parallax for topocentric horizontal coordinates
     // http://stjarnhimlen.se/comp/ppcomp.html#13
+    // FIXME: is there a clean way to _only_ do this for the moon?
     const altitude = Math.asin(sin_altitude) * (180 / Math.PI) - parallax(planet.distance) * cos_altitude;
 
     // initialize this object
