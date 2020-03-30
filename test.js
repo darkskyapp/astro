@@ -128,9 +128,9 @@ describe("astro", () => {
     // I know from merchant traders that the distance between Alexandria and
     // Syene is about ~5000 stadia~ 912km. So how big is the earth?
     const earth = 912.017 * 360 / (syene.altitude - alexandria.altitude);
-    assert_close(earth, 40075.017, 100);
+    assert_close(earth, 40075.017, 40);
 
-    // Hey! Accurate to within a quarter of a percent! That's pretty good.
+    // Hey! Accurate to within a tenth of a percent! That's pretty good.
   });
 
   it("should correctly determine solar azimuth", () => {
