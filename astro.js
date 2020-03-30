@@ -426,13 +426,25 @@ class Saturn extends Planet {
 
 class Uranus extends Planet {
   setTime(time) {
-    // FIXME: add periodic terms
     super.setTime(
       time,
-      19.218446,
+      19.192234 + 0.041284 * Math.cos(4.423865 +  2324175e-18 * time)
+                - 0.005769 * Math.cos(5.074979 +  2016563e-18 * time)
+                + 0.004975 * Math.cos(0.323382 + 14412163e-18 * time)
+                - 0.004779 * Math.cos(5.170813 +    45572e-18 * time)
+                - 0.003394 * Math.cos(0.621459 +  4386310e-18 * time)
+                - 0.002704 * Math.cos(2.577915 +  2278603e-18 * time)
+                - 0.001581 * Math.cos(3.130825 +  2369747e-18 * time),
        0.046389 -       9e-18 * time,
        0.013491 +       4e-18 * time,
-       3.230531 + 2377412e-18 * time,
+       3.230531 + 2377412e-18 * time - 0.015286 * Math.cos(0.441637 +    45572e-18 * time)
+                                     - 0.004363 * Math.cos(2.853103 +  2324175e-18 * time)
+                                     + 0.000679 * Math.cos(3.469916 +  2016563e-18 * time)
+                                     - 0.000637 * Math.cos(5.310891 +    91144e-18 * time)
+                                     - 0.000593 * Math.cos(5.631656 +   353183e-18 * time)
+                                     - 0.000290 * Math.cos(4.148739 +  2278603e-18 * time)
+                                     + 0.000258 * Math.cos(5.035927 + 14412163e-18 * time)
+                                     - 0.000177 * Math.cos(3.785510 +  1162087e-18 * time),
        3.011729 +    8221e-18 * time,
        1.288919 +    2882e-18 * time,
     );
