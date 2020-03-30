@@ -3,7 +3,7 @@
 // Jean Meeus, "Astronomical Algorithms, 2nd Ed.", p. 147.
 // radians
 function obliquity(time) {
-  return 0.409161 - 4121e-18 * time;
+  return 0.409161 - 72e-18 * time;
 }
 
 // http://aa.usno.navy.mil/faq/docs/GAST.php
