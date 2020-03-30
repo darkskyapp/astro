@@ -28,7 +28,7 @@ function assert_angle(actual, expected, threshold) {
 }
 
 describe("astro", () => {
-  it("should return the position of the sun", () => {
+  it("should correctly determine the sun's ecliptic position", () => {
     const spring = astro.sun(Date.parse("1999-03-21T01:46Z"));
     const summer = astro.sun(Date.parse("1999-06-21T19:49Z"));
     const autumn = astro.sun(Date.parse("1999-09-23T11:32Z"));
@@ -102,7 +102,7 @@ describe("astro", () => {
     );
   });
 
-  it("should correctly determine the sun's position", () => {
+  it("should correctly determine the sun's position for an observer", () => {
     // OK, kids, gather round! We're going to digitally repeat Eratosthenes'
     // experiment to estimate the meridian arc using the sun.
 
@@ -121,13 +121,13 @@ describe("astro", () => {
     // Now, I'm in Alexandria and I measure the sun's angle at solar noon using
     // a meter-long gnomon. The length of its shadow is about 1/7 m.
     const alexandria = pos.observer(31.200000, 29.916667);
-    assert_close(1 / Math.tan(alexandria.elevation), 1 / 7, 0.01);
+    assert_close(1 / Math.tan(alexandria.altitude * Math.PI / 180), 1 / 7, 0.01);
     // Check the azimuth, just to make sure it's there and correct.
     assert_angle(alexandria.azimuth, 161.2, 1);
 
     // I know from merchant traders that the distance between Alexandria and
     // Syene is about ~5000 stadia~ 912km. So how big is the earth?
-    const earth = 912.017 * 2 * Math.PI / (syene.altitude - alexandria.altitude);
+    const earth = 912.017 * 360 / (syene.altitude - alexandria.altitude);
     assert_close(earth, 40075.017, 100);
 
     // Hey! Accurate to within a quarter of a percent! That's pretty good.
