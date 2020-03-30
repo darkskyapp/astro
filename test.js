@@ -102,6 +102,37 @@ describe("astro", () => {
     );
   });
 
+  it("should correctly determine the sun's position", () => {
+    // OK, kids, gather round! We're going to digitally repeat Eratosthenes'
+    // experiment to estimate the meridian arc using the sun.
+
+    // At noon on the summer solstice, the sun is directly above Syene. We know
+    // this since you can look down a deep well and see no shadow.
+    // (NOTE: I cheated a little here! Syene is now Aswan, and Aswan is no
+    // longer on the Tropic of Cancer (since the tropics migrate about 15 m/yr).
+    // So I took Aswan's longitude but used the modern latitude.)
+    const pos = astro.sun(Date.parse("2019-06-21T11:49:03+0200"));
+
+    const syene = pos.observer(23.43679, 32.899722);
+    assert_angle(syene.altitude, 90, 0.01);
+    // NOTE: Don't test azimuth here. It's a non-sense number when the sun is
+    // directly overhead.
+
+    // Now, I'm in Alexandria and I measure the sun's angle at solar noon using
+    // a meter-long gnomon. The length of its shadow is about 1/7 m.
+    const alexandria = pos.observer(31.200000, 29.916667);
+    assert_close(1 / Math.tan(alexandria.elevation), 1 / 7, 0.01);
+    // Check the azimuth, just to make sure it's there and correct.
+    assert_angle(alexandria.azimuth, 161.2, 1);
+
+    // I know from merchant traders that the distance between Alexandria and
+    // Syene is about ~5000 stadia~ 912km. So how big is the earth?
+    const earth = 912.017 * 2 * Math.PI / (syene.altitude - alexandria.altitude);
+    assert_close(earth, 40075.017, 100);
+
+    // Hey! Accurate to within a quarter of a percent! That's pretty good.
+  });
+
   it("should correctly determine solar azimuth", () => {
     // https://aa.usno.navy.mil/cgi-bin/aa_altazw.pl?form=2&body=10&year=2019&month=4&day=10&intv_mag=10&place=Salvador%2C+Brazil&lon_sign=-1&lon_deg=38&lon_min=28&lat_sign=-1&lat_deg=12&lat_min=58&tz=3&tz_sign=-1
     // Salvador, Brazil: -12.96667, -38.46667
@@ -174,25 +205,58 @@ describe("astro", () => {
   });
 
   it("should correctly return moon rise/transit/set times for Albuquerque", () => {
-    const moon = astro.moon(Date.parse("2006-03-20T19:06:28.800Z"));
     const lat =   35.05;
     const lon = -106.62;
 
-    assert_close(
-      moon.rise(lat, lon),
-      Date.parse("2006-03-21T00:16-0700"),
-      90000,
-    );
-    assert_close(
-      moon.transit(lat, lon),
-      Date.parse("2006-03-21T05:02-0700"),
-      90000,
-    );
-    assert_close(
-      moon.rise(lat, lon),
-      Date.parse("2006-03-21T09:45-0700"),
-      90000,
-    );
+    const moon = astro.moon(Date.parse("2006-03-20T19:06:28.800Z"));
+    assert_close(moon.rise(lat, lon), Date.parse("2006-03-21T00:16-0700"), 90000);
+    assert_close(moon.transit(lat, lon), Date.parse("2006-03-21T05:02-0700"), 90000);
+    assert_close(moon.set(lat, lon), Date.parse("2006-03-21T09:45-0700"), 90000);
+  });
+
+  it("should correctly return moon rise/transit/set times for NYC", () => {
+    const lat =  40.71;
+    const lon = -74.01;
+
+    const a = astro.moon(Date.parse("2016-03-13T00:00-0500"));
+    assert_close(a.rise(lat, lon), Date.parse("2016-03-13T10:17-0400"), 90000);
+    assert_close(a.transit(lat, lon), Date.parse("2016-03-13T17:24-0400"), 90000);
+    assert_close(a.set(lat, lon), Date.parse("2016-03-14T00:31-0400"), 90000);
+
+    // later that day so we can get a diff moonrise time!
+    const b = astro.moon(Date.parse("2016-03-13T12:00-0500"));
+    assert_close(b.rise(lat, lon), Date.parse("2016-03-14T11:04-0400"), 90000);
+    assert_close(b.transit(lat, lon), Date.parse("2016-03-13T17:24-0400"), 90000);
+    assert_close(b.set(lat, lon), Date.parse("2016-03-14T00:31-0400"), 90000);
+
+    // a different period entirely...
+    const c = astro.moon(Date.parse("2017-12-01T00:00-0500"));
+    assert_close(c.rise(lat, lon), Date.parse("2017-12-01T15:27-0500"), 90000);
+    assert_close(c.transit(lat, lon), Date.parse("2017-12-01T22:22-0500"), 90000);
+    assert_close(c.set(lat, lon), Date.parse("2017-12-01T04:13-0500"), 90000);
+
+    // and forward in that period so we get no transit...
+    const d = astro.moon(Date.parse("2017-12-01T22:30:00-0500"));
+    assert_close(d.rise(lat, lon), Date.parse("2017-12-02T16:10-0500"), 90000);
+    assert_close(d.transit(lat, lon), NaN, 90000);
+    assert_close(d.set(lat, lon), Date.parse("2017-12-02T05:26-0500"), 90000);
+
+    // and forward in that period (again) so we get the next transit...
+    const e = astro.moon(Date.parse("2017-12-01T23:30:00-0500"));
+    assert_close(e.rise(lat, lon), Date.parse("2017-12-02T16:10-0500"), 90000);
+    assert_close(e.transit(lat, lon), Date.parse("2017-12-02T23:20-0500"), 90000);
+    assert_close(e.set(lat, lon), Date.parse("2017-12-02T05:26-0500"), 90000);
+  });
+
+  it("should correctly return moon rise/transit/set times for Troy", () => {
+    const lat =  42.73;
+    const lon = -73.68;
+
+    // right around the moon transit time
+    const moon = astro.moon(Date.parse("2016-01-01T05:00-0500"));
+    assert_close(moon.rise(lat, lon), Date.parse("2016-01-02T00:04-0500"), 90000);
+    assert_close(moon.transit(lat, lon), Date.parse("2016-01-01T05:20-0500"), 90000);
+    assert_close(moon.set(lat, lon), Date.parse("2016-01-01T11:26-0500"), 90000);
   });
 
   it("should return the ecliptic longitude of every planet", () => {
