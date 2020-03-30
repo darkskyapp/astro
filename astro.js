@@ -371,13 +371,26 @@ class Mars extends Planet {
 
 class Jupiter extends Planet {
   setTime(time) {
-    // FIXME: add periodic terms
     super.setTime(
       time,
-      5.202603,
+      5.202603 - 0.002762 * Math.cos(5.591681 + 20051705e-18 * time)
+               - 0.002000 * Math.cos(1.727862 + 16565442e-18 * time)
+               + 0.000883 * Math.cos(0.705774 + 13295647e-18 * time)
+               + 0.000654 * Math.cos(2.782676 + 10025852e-18 * time)
+               - 0.000462 * Math.cos(1.948722 +  3269795e-18 * time)
+               - 0.000290 * Math.cos(2.049188 + 30077557e-18 * time)
+               + 0.000273 * Math.cos(5.788194 +   216467e-18 * time)
+               - 0.000231 * Math.cos(3.467895 + 23321500e-18 * time),
       0.048449 +       52e-18 * time,
       0.022775 -       30e-18 * time,
-      3.551060 + 16792621e-18 * time,
+      3.551060 + 16792621e-18 * time + 0.005749 * Math.cos(1.233091 +   216467e-18 * time)
+                                     - 0.000945 * Math.cos(0.879411 + 20051705e-18 * time)
+                                     - 0.000776 * Math.cos(3.297453 + 16565442e-18 * time)
+                                     - 0.000602 * Math.cos(3.430583 +  3269795e-18 * time)
+                                     - 0.000400 * Math.cos(5.404771 + 13295647e-18 * time)
+                                     + 0.000387 * Math.cos(4.353461 + 10025852e-18 * time)
+                                     - 0.000081 * Math.cos(0.493957 +  6539590e-18 * time)
+                                     - 0.000079 * Math.cos(3.632640 + 30077557e-18 * time),
       0.241683 +     8919e-18 * time,
       1.748089 +     5647e-18 * time,
     );
