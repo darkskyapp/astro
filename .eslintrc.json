@@ -2,6 +2,7 @@
   "extends": "@darkskyapp",
   "rules": {
     "max-len": "off",
-    "no-multi-spaces": "off"
+    "no-multi-spaces": "off",
+    "indent": "off"
   }
 }
