@@ -453,13 +453,25 @@ class Uranus extends Planet {
 
 class Neptune extends Planet {
   setTime(time) {
-    // FIXME: add periodic terms
     super.setTime(
       time,
-      30.110387,
+      30.069163 - 0.015961 * Math.cos(5.362477 +  1162087e-18 * time)
+                - 0.013689 * Math.cos(0.195809 +  1207659e-18 * time)
+                + 0.007926 * Math.cos(5.166641 +    45572e-18 * time)
+                - 0.005322 * Math.cos(0.329712 +  1116515e-18 * time)
+                - 0.004958 * Math.cos(2.534444 + 15574250e-18 * time)
+                - 0.002746 * Math.cos(6.017464 +  5548398e-18 * time)
+                + 0.001029 * Math.cos(4.439457 +  2324175e-18 * time),
        0.009454 +       2e-18 * time,
        0.030940 -      51e-18 * time,
-       4.160580 + 1216090e-18 * time,
+       4.160580 + 1216090e-18 * time + 0.010179 * Math.cos(0.443976 +    45572e-18 * time)
+                                     + 0.001184 * Math.cos(3.790845 +  1162087e-18 * time)
+                                     + 0.000922 * Math.cos(4.902746 +  1207659e-18 * time)
+                                     + 0.000418 * Math.cos(5.326966 +    91144e-18 * time)
+                                     + 0.000374 * Math.cos(5.043787 +  1116515e-18 * time)
+                                     + 0.000165 * Math.cos(4.104978 + 15574250e-18 * time)
+                                     + 0.000090 * Math.cos(1.304998 +  5548398e-18 * time)
+                                     - 0.000045 * Math.cos(2.864244 +  2324175e-18 * time),
        0.832389 +    7888e-18 * time,
        2.294295 +    6096e-18 * time,
     );
