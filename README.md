@@ -1,5 +1,5 @@
 # astro
-A library that calculates the position of the sun and moon in the sky.
+A library that calculates the position of the sun and moon in the sky. **THIS LIBRARY IS NO LONGER ACTIVELY MAINTAINED. PLEASE FORK IF YOU WISH TO CONTINUE USING IT.**
 
 ## Usage
 Methods for calculating positions of the moon are in the `lunar` submodule;
